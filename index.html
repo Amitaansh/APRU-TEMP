@@ -358,10 +358,10 @@ img {
   grid-row: 2;
 }
 
-/* The theme's title, on its own row above the body and running to the right
- * gutter. It starts at column 3 rather than column 1 so its left edge is the
- * body's, and it is set flush right, so the heading arrives at the far edge of
- * the screen and the paragraph begins at the near one.
+/* The theme's title, running to the right gutter and set flush right, so the
+ * heading arrives at the far edge of the screen and the paragraph begins at the
+ * near one. It starts at column 3 rather than column 1 so its left edge is the
+ * body's.
  *
  * The rows are named rather than left to auto-placement: placement is sparse by
  * default and never moves the cursor backwards, so naming them is what keeps
@@ -371,8 +371,45 @@ img {
   grid-row: 1;
 
   /* On top of the grid's own 20rem row gap, for the 40 a heading wants between
-   * itself and the text it introduces. */
+   * itself and the text it introduces. Nothing is under it once the paragraph
+   * moves up alongside; see the 1280 block. */
   margin-bottom: 20rem;
+
+  /* So the title can be sized against THIS cell rather than the window. It has
+   * to hold "Resilience(s)" on one line at every width, because a wrap inside
+   * .ln-mask breaks the clip -- see MASKED REVEAL -- and the cell is not a fixed
+   * fraction of the viewport: the gutter and the fourteen gaps are rem, and rem
+   * stops tracking the window at its clamp floor around 1728. */
+  container-type: inline-size;
+}
+
+/*
+ * Above 1280 the paragraph comes up beside the title instead of sitting under
+ * it. Written as the addition rather than the base, so the narrow layout is the
+ * one that needs no query.
+ *
+ * 1280 is a floor, not a round number. Under it the title's cell cannot hold
+ * "Resilience(s)" at a size that still reads as the heading -- by 940 the cap
+ * below sets it at 68rem against a label beside it set at 72.
+ */
+@media (min-width: 1280px) {
+  .lane-right-label {
+    grid-row: 1;
+  }
+
+  .lane-title {
+    grid-column: 9 / span 7;
+    margin-bottom: 0;
+  }
+
+  /* align-self is what centres the paragraph against the title's height. It only
+   * bites on a grid item, which is why it lives in here rather than on the base
+   * rule: stacked, there is nothing to centre in. */
+  .lane-right-body {
+    grid-column: 3 / span 6;
+    grid-row: 1;
+    align-self: center;
+  }
 }
 
 /* The closing statement, one column in from the page gutter. Not the body lane:
@@ -415,7 +452,7 @@ img {
 }
 
 /* The theme screen only, and the exception the floor above allows for. Its
- * content is 375rem tall now that the title lies down, and 100 a side would be
+ * content is 238rem tall now that the title lies down, and 100 a side would be
  * more padding than section. The seam still reads without it: white meets the
  * artwork above and the black closing screen below, so the change of ground
  * carries what the air used to. */
@@ -438,14 +475,19 @@ img {
  * Reads top-to-bottom down the left column, which is what vertical-rl gives on
  * its own -- Latin glyphs laid on their side, turned a quarter clockwise.
  *
- * NO 180 TURN. Adding one flips the axis to bottom-to-top, and the label has to
- * read the same way as the vertical title beside it. The title cannot carry that
- * turn at all; see VERTICAL TITLE for why.
+ * NO 180 TURN. Adding one flips the axis to bottom-to-top, which was the shape
+ * this had while the title beside it was turned too. The title lies down now and
+ * this is the screen's only vertical element, so the axis is its own choice --
+ * top-to-bottom, because that is the direction the page is read in.
+ *
+ * 50rem, not the 80 it carried while it was the section's tallest element. Set
+ * vertically its HEIGHT is the length of its text, so at 80 it stood 375rem tall
+ * against a 238rem title and set the height of a screen it is a caption on.
  */
 .sec-label {
   writing-mode: vertical-rl;
   font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 80rem;
+  font-size: 50rem;
   letter-spacing: -0.03em;
   line-height: 1;
   white-space: nowrap;
@@ -483,26 +525,46 @@ img {
  * -----------------------------------------------------------------------------
  * THE THEME'S TITLE
  * -----------------------------------------------------------------------------
- * Two lines, flush right against the page gutter, above the paragraph.
+ * Two lines, flush right against the page gutter, with the paragraph beside them
+ * above 1280 and under them below it.
  *
  * It was set vertically for a while, and that is what cost this screen its
  * height: a vertical line is as tall as its word is long, so "Resilience(s)"
  * alone made the section 607rem before any padding was added. Lying down, the
- * same two lines are 212rem, and the height stops depending on how long the
- * words happen to be. "The theme" beside it stays vertical -- one turned
- * element on a screen reads as a device, two read as a system this page does
- * not otherwise have.
+ * same two lines are 238rem, and the height stops depending on how long the
+ * words happen to be. "The theme" beside it stays vertical -- one turned element
+ * on a screen reads as a device, two read as a system this page does not
+ * otherwise have.
  *
- * The spans are blocks because they are lines, not because of the alignment:
- * left inline they would set as one line and break wherever the measure ran out.
+ * THE MASKS CARRY THE LEADING, NOT line-height. t-h2 is set at 0.9, which is
+ * 106rem of advance against 126rem of ink -- "Bridging" drops 31 below its
+ * baseline and "Resilience(s)" reaches 95 above its own, so at 0.9 the two lines
+ * overlap by about 20rem and the parenthesis fouls the line above. Under .e-lh
+ * each .ln-mask is padded by --off and pulled back by an equal negative margin,
+ * and ADJACENT MASKS COLLAPSE those negative margins rather than summing them:
+ * the pair nets out at +0.22em, so the advance is 132rem and the ink clears by
+ * six. Take the masks off these lines and the overlap comes back.
+ *
+ * The cap is measured in cqw against .lane-title, not in vw, because the cell is
+ * not a fixed fraction of the window. "Resilience(s)" is 5.53em wide; 17cqw
+ * holds it on one line from 768 up, and stays out of the way at 1920, where
+ * 118rem is the smaller of the two.
  */
 .ttl {
   text-align: right;
 }
 
-.ttl > span {
-  display: block;
+/* From 768 up only. Under it .t-h2 has its own step (34rem) and the second line
+ * carries a 0.9em indent, and this rule -- later in the sheet and the same
+ * weight -- would win over both, set the title at 17cqw and push the indented
+ * line straight through the side of its own mask, which clips horizontally as
+ * well as vertically. */
+@media (min-width: 768px) {
+  .ttl {
+    font-size: min(118rem, 17cqw);
+  }
 }
+
 
 /* Under 768px .grd is a block stack, the heading is the widest thing on the
  * screen, and flush right would hang it off the edge the eye reads from. Back to
@@ -1231,6 +1293,22 @@ html[data-entered] .hero-clip {
   }
 }
 </style>
+
+<!--
+  Every reveal on this page is a CSS end state that the script releases by adding
+  .is-in, and the hero's clip is released by [data-entered] on <html>. With
+  scripting off neither ever arrives, so the page renders blank but for the
+  header lockup: eight reveal blocks hold their opening state, and the artwork
+  stays clipped to nothing. These are the same three end states the
+  reduced-motion block at the foot of the stylesheet resolves to. No !important
+  needed -- they match the specificity of what they override and come after it.
+-->
+<noscript><style>
+  .ln-mask > .ln,
+  .ln-mask > .wd { transform: none; }
+  .rise { opacity: 1; transform: none; }
+  .hero-clip { clip-path: none; }
+</style></noscript>
 </head>
 
 <body>
@@ -1286,8 +1364,9 @@ html[data-entered] .hero-clip {
     <div class="ctr">
       <!--
         DOM order is label, title, body -- which is what the mobile stack wants,
-        since .grd is a block there. Desktop puts them in their columns instead,
-        so the title lands on the right with the body centred against it.
+        since .grd is a block there. Every other width places the cells by column
+        and row, so above 1280 the title lands on the right with the body centred
+        beside it, and below that the body drops underneath.
       -->
       <div class="grd">
         <div class="lane-right-label sec-spine sec-head">
@@ -1295,15 +1374,16 @@ html[data-entered] .hero-clip {
         </div>
 
         <!--
-          No reveal on this one. It arrives with the screen rather than into it,
-          which is what "The theme" beside it has always done -- and between two
-          elements sharing a screen this quiet, one animating and one not reads
-          as an oversight rather than as a stagger.
+          The masks are not only the reveal. .e-lh is what stops the mask
+          clipping the descender of "Bridging", and the pair of them is what
+          holds the two lines apart at all -- see THE THEME'S TITLE. Neither is
+          optional here, and a plain <span> in their place puts the lines back on
+          top of each other.
         -->
         <div class="lane-title">
-          <h2 class="t-h2 ttl">
-            <span>Bridging</span>
-            <span>Resilience(s)</span>
+          <h2 class="e-lh t-h2 ttl" data-reveal>
+            <span class="ln-mask"><span class="ln" style="transition-delay:0s">Bridging</span></span>
+            <span class="ln-mask"><span class="ln" style="transition-delay:0.08s">Resilience(s)</span></span>
           </h2>
         </div>
 
