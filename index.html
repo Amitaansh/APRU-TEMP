@@ -1,0 +1,1551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Bridging Resilience(s) · The 10th Conference of APRU-SCL</title>
+<meta name="description" content="Bridging Resilience(s) — The 10th Conference of APRU-SCL, 21–23 May 2027, Singapore. Hosted by the NUS Department of Architecture, College of Design and Engineering.">
+<link rel="canonical" href="https://apruscl2027.com/">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bridging Resilience(s)">
+<meta property="og:title" content="Bridging Resilience(s) · The 10th Conference of APRU-SCL">
+<meta property="og:description" content="Bridging Resilience(s) — The 10th Conference of APRU-SCL, 21–23 May 2027, Singapore. Hosted by the NUS Department of Architecture, College of Design and Engineering.">
+<meta property="og:url" content="https://apruscl2027.com/">
+<meta property="og:locale" content="en_SG">
+<meta property="og:image" content="https://apruscl2027.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bridging Resilience(s) — the 10th Conference of APRU-SCL, 21-23 May 2027, Singapore">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bridging Resilience(s) · The 10th Conference of APRU-SCL">
+<meta name="twitter:description" content="Bridging Resilience(s) — The 10th Conference of APRU-SCL, 21–23 May 2027, Singapore. Hosted by the NUS Department of Architecture, College of Design and Engineering.">
+<meta name="twitter:image" content="https://apruscl2027.com/og.png">
+
+<link rel="preload" href="fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/HedvigLettersSerif-Regular.woff2" as="font" type="font/woff2" crossorigin>
+
+<style>
+/*
+ * =============================================================================
+ * A HOLDING PAGE FOR apruscl2027.com
+ * =============================================================================
+ * One file, no build step. The design system below is copied from the real
+ * site's codebase/app/globals.css, which cannot be included directly: it opens
+ * with `@import "tailwindcss"` and configures its theme through an `@theme`
+ * block that only the PostCSS build understands. Everything here carrying a
+ * class name from that file is a verbatim copy of it, so the two cannot drift;
+ * the classes further down stand in for the Tailwind utilities the React
+ * components used, with the same declarations.
+ *
+ * The halo -- the WebGL torus that arcs behind the wordmark on the real site --
+ * is deliberately absent. See THE WORDMARK below.
+ */
+
+/*
+ * -----------------------------------------------------------------------------
+ * FACES
+ * -----------------------------------------------------------------------------
+ * next/font's job, done by hand. Switzer is a variable face carrying the whole
+ * 100-900 range in one file; Hedvig is used at 400 and nowhere else, so the
+ * static Regular is the whole requirement.
+ */
+@font-face {
+  font-family: switzer;
+  src: url("fonts/Switzer-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hedvig Letters Serif";
+  src: url("fonts/HedvigLettersSerif-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * FLUID ROOT
+ * -----------------------------------------------------------------------------
+ * The whole site is drawn at a fixed design basis and scaled by viewport width:
+ * 1rem === 1px at 1920 wide on desktop, and 1px at 375 wide on mobile. Every
+ * number in this file is therefore "px at design width", which is why nothing
+ * ever reflows between breakpoints -- it only scales.
+ *
+ * The clamp bounds are expressed in rem, not px, on purpose. On the root element
+ * `rem` resolves against the *initial* font-size, i.e. the reader's own browser
+ * default. So a visitor who has raised their base size still gets proportionally
+ * larger type everywhere, which a bare vw value would throw away.
+ */
+:root {
+  font-size: clamp(0.05625rem, 0.0520833333vw, 0.075rem);
+}
+
+@media (max-width: 767.98px) {
+  :root {
+    font-size: clamp(0.05rem, 0.2666666667vw, 0.0725rem);
+  }
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * PALETTE
+ * -----------------------------------------------------------------------------
+ * Five neutrals and one accent. --ac has exactly one job -- live state, i.e. a
+ * deadline that is open or the date that is next -- and is never used for
+ * headings, links, borders, hovers or decoration. #c2410c clears 5.9:1 on white,
+ * so it is safe as text; the brand #f89c2c is not (1.9:1) and survives only
+ * inside the hero artwork.
+ */
+:root {
+  --wh: #ffffff;
+  --bk: #000000;
+  --gr: #eeeeee;
+  --gr2: #e2e2e2;
+  --gr3: #6e6e6e;
+
+  /* Secondary text on the dark ground. #929292 is the reference's grey and
+   * clears 6.7:1 on black, but only 3.1:1 on white -- hence the pair. */
+  --gr3-dark: #929292;
+  --ac: #c2410c;
+
+  /* The brand orange. Never used as text on white (1.9:1) -- only on the dark
+   * ground, where it clears 8.9:1, and inside the artwork. */
+  --orange: #f89c2c;
+
+  /* Descender headroom for masked lines, sized from the real font metrics.
+   * Hedvig's ink spans 1.214em, Switzer's 1.185em, so at the tightest leading on
+   * the site (0.82) the headroom needed per side is 0.197em. */
+  --off: 0.22em;
+
+  /* Height of the fixed header: 24 of pad, three 19rem lines, 24 of pad. */
+  --hdr: 105rem;
+
+  --font-switzer: switzer;
+  --font-hedvig: "Hedvig Letters Serif";
+
+  /* Every transition on the site uses this curve. Slow, no overshoot. */
+  --ease-ref: cubic-bezier(0.17, 0.84, 0.44, 1);
+
+  color-scheme: light;
+}
+
+/* -------------------------------------------------------------------------- */
+/* BASE                                                                       */
+/* -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--wh);
+  color: var(--bk);
+  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
+  font-size: 18rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  font-synthesis-weight: none;
+}
+
+@media (max-width: 767.98px) {
+  body {
+    font-size: 15rem;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+  font-weight: 400;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  object-fit: cover;
+}
+
+::selection {
+  background: var(--ac);
+  color: var(--wh);
+}
+
+:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4rem;
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * TYPE SCALE
+ * -----------------------------------------------------------------------------
+ * Serif display, sans text. Leading tightens as size grows -- at display sizes
+ * the lines are meant to stack almost touching.
+ */
+.t-h1 {
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+  font-size: 175rem;
+  letter-spacing: -0.03em;
+  line-height: 0.85;
+}
+
+.t-h2 {
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+  font-size: 118rem;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+}
+
+.t-h3 {
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+  font-size: 80rem;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+}
+
+.t-h4 {
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+  font-size: 40rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.t-b1 {
+  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
+  font-size: 18rem;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.t-b2 {
+  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
+  font-size: 15rem;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+/* Small serif label. The signature move of the reference: a tiny serif word
+ * sitting beside sans data, in place of an uppercase mono micro-caption. */
+.t-lbl {
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+  font-size: 16rem;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+@media (max-width: 767.98px) {
+  .t-h1 {
+    font-size: 40rem;
+    line-height: 0.95;
+  }
+  .t-h2 {
+    font-size: 34rem;
+  }
+  .t-h3 {
+    font-size: 28rem;
+  }
+  .t-h4 {
+    font-size: 22rem;
+  }
+  .t-b1 {
+    font-size: 15rem;
+  }
+  .t-b2 {
+    font-size: 13rem;
+  }
+  .t-lbl {
+    font-size: 14rem;
+  }
+}
+
+.f-serif {
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+}
+
+.dim {
+  color: var(--gr3);
+}
+
+/* Live state -- the accent's only assignment. */
+.live {
+  color: var(--ac);
+}
+
+/* Digits that sit in columns have to line up. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * LAYOUT
+ * -----------------------------------------------------------------------------
+ * A 30px page gutter at 1920 -- content sits close to the edge, and text is kept
+ * readable by living inside a few of the fifteen columns rather than by centring
+ * a narrow container.
+ */
+.ctr {
+  display: block;
+  width: 100%;
+  padding: 0 30rem;
+}
+
+.grd {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 20rem;
+  width: 100%;
+}
+
+@media (max-width: 767.98px) {
+  .ctr {
+    padding: 0 15rem;
+  }
+  .grd {
+    display: block;
+  }
+}
+
+/*
+ * The lanes. On the real site these columns are the complement of whichever side
+ * the halo has taken, so the ring and the type can never collide. The ring is
+ * not here, but the asymmetry it produced IS the page's proportion, so the
+ * geometry is kept exactly (see COLUMNS in components/ui/Section.tsx):
+ *
+ *   right  ->  halo in cols 11-15, label in 1-2, body in 3-10
+ *   left   ->  halo in cols 1-5,   label in 6-7, body in 8-15
+ */
+.lane-right-label {
+  grid-column: 1 / span 2;
+}
+.lane-right-body {
+  grid-column: 3 / span 8;
+}
+.lane-left-body {
+  grid-column: 8 / span 8;
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * SECTION RHYTHM
+ * -----------------------------------------------------------------------------
+ * .pad-flow is for a section that continues the one above it -- it drops the top
+ * pad so two blocks read as one, instead of paying 180 twice at the seam.
+ */
+.pad {
+  padding-top: 180rem;
+  padding-bottom: 180rem;
+}
+
+.pad-flow {
+  padding-top: 0;
+}
+
+@media (max-width: 767.98px) {
+  .pad {
+    padding-top: 80rem;
+    padding-bottom: 80rem;
+  }
+  .pad-flow {
+    padding-top: 0;
+  }
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * VERTICAL SECTION LABEL
+ * -----------------------------------------------------------------------------
+ * Reads bottom-to-top down the left column. writing-mode plus a 180 turn is what
+ * gets bottom-to-top -- vertical-rl on its own reads top-to-bottom.
+ */
+.sec-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+  font-size: 80rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .sec-label {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 22rem;
+  }
+  .sec-head {
+    margin-bottom: 24rem;
+  }
+}
+
+/*
+ * The spine holds below the header while its section's body scrolls past it,
+ * then leaves with the section. A grid item stretches to its row by default and
+ * a stretched box has nothing to stick within, so `align-self: start` is not a
+ * nicety here -- without it the rule does nothing at all.
+ *
+ * Desktop only, and not because of the header: under 768px .grd is a block stack
+ * and .sec-label is already lying flat above the body, where sticking it would
+ * pin a heading over the type it introduces.
+ */
+@media (min-width: 768px) {
+  .sec-spine {
+    position: sticky;
+    top: calc(var(--hdr) + 40rem);
+    align-self: start;
+  }
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * LINK
+ * -----------------------------------------------------------------------------
+ * A 1px rule that wipes in from the left over 1.109s and, on leave, retracts to
+ * the right. The absurd duration is the point -- it reads as deliberate rather
+ * than as a hover state.
+ */
+.link {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  cursor: pointer;
+}
+
+.link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.08em;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 1.109s var(--ease-ref);
+  pointer-events: none;
+}
+
+.link:hover::before,
+.link:focus-visible::before {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * MASKED REVEAL
+ * -----------------------------------------------------------------------------
+ * A single line of type rises out of a clipped wrapper.
+ *
+ * `overflow: hidden` clips to the MASK's padding box, so the descender room has
+ * to be bought there -- padding on the inner line cannot buy it. The mask is
+ * inflated by --off top and bottom and pulled back by an equal negative margin,
+ * which is net-zero: the mask's outer box stays exactly one line-height tall and
+ * layout is untouched, while its clip window is line-height + 2x--off.
+ *
+ * MASKS ARE FOR SINGLE-LINE ELEMENTS ONLY. Anything that wraps gets .rise -- a
+ * wrapping inline-block inside a mask breaks the arithmetic above, because the
+ * element is then taller than one line and the clip no longer corresponds to it.
+ */
+.ln-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.ln-mask > .ln {
+  display: block;
+  will-change: transform;
+}
+
+.ln-mask > .wd {
+  display: inline-block;
+  will-change: transform;
+}
+
+.e-lh .ln-mask {
+  padding-top: var(--off);
+  padding-bottom: var(--off);
+  margin-top: calc(var(--off) * -1);
+  margin-bottom: calc(var(--off) * -1);
+}
+
+/*
+ * A [data-reveal] element gets .is-in once, which releases every mask and rise
+ * inside it. Stagger is done with transition-delay at the call site rather than
+ * with per-child selectors, so a section can order its own children.
+ */
+.ln-mask > .ln,
+.ln-mask > .wd {
+  transform: translate3d(0, calc(100% + var(--off)), 0);
+  transition: transform 1.15s var(--ease-ref);
+}
+
+.is-in .ln-mask > .ln,
+.is-in .ln-mask > .wd,
+.is-in.ln-mask > .ln,
+.is-in.ln-mask > .wd {
+  transform: translate3d(0, 0, 0);
+}
+
+.rise {
+  opacity: 0;
+  transform: translate3d(0, 24rem, 0);
+  transition:
+    opacity 1s var(--ease-ref),
+    transform 1s var(--ease-ref);
+}
+
+.is-in .rise,
+.is-in.rise {
+  opacity: 1;
+  transform: none;
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * BUTTON
+ * -----------------------------------------------------------------------------
+ * A rectangle and a rule. No radius, no shadow, no icon.
+ *
+ * The fill is a pair of tokens rather than two literals because the button has
+ * to be able to sit on the dark half of the site: a hard-coded black fill is
+ * invisible on the footer, which is where the primary CTA lives.
+ */
+.btn {
+  --btn-fill: var(--bk);
+  --btn-ink: var(--wh);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rem;
+  padding: 14rem 34rem;
+  border: 1px solid currentColor;
+  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16rem;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  background-color: transparent;
+  color: inherit;
+  transition:
+    background-color 0.6s var(--ease-ref),
+    color 0.6s var(--ease-ref);
+}
+
+.btn:hover {
+  background-color: var(--btn-fill);
+  color: var(--btn-ink);
+}
+
+[data-ground="dark"] .btn {
+  --btn-fill: var(--wh);
+  --btn-ink: var(--bk);
+}
+
+@media (max-width: 767.98px) {
+  .btn {
+    padding: 16rem 28rem;
+    font-size: 14rem;
+  }
+}
+
+/*
+ * The P0 call to action. Registration is not open, so this is a stated status
+ * rather than a button that goes nowhere: it takes no hover and no pointer.
+ * See content/phases.ts in the codebase -- filling NEXT_PUBLIC_INTEREST_FORM_URL
+ * is what turns this into a real link on the site.
+ */
+.btn-pending {
+  cursor: default;
+}
+
+.btn-pending:hover {
+  background-color: transparent;
+  color: inherit;
+}
+
+/*
+ * =============================================================================
+ * INDEX ROW
+ * =============================================================================
+ * The rule-separated row is the structural unit of the whole site -- it stands
+ * in for every card grid. There are no cards.
+ *
+ * THE HOVER. The row inverts, with the fill sweeping in from the left and
+ * retracting back to the left. It is a clip over a second copy of the row rather
+ * than a background plus a colour transition, because the type has to change as
+ * the edge passes it rather than all at once. `mix-blend-mode: difference` would
+ * do that for free, but it inverts every colour and the accent would come out
+ * cyan -- and these rows carry .live.
+ *
+ * THE RULES ARE BORDERS. A standalone hairline is drawn in the parent's
+ * currentColor, so it would neither invert with the row nor sit under it, and
+ * every filled row would carry a seam top and bottom.
+ */
+.rulelist {
+  border-bottom: 1px solid currentColor;
+}
+
+.idx-row {
+  --row-pad: 34rem;
+
+  /* The inverted ground, as tokens rather than literals -- the same way .dim and
+   * .live already flip under [data-ground="dark"]. */
+  --row-fill: var(--bk);
+  --row-ink: var(--wh);
+  --row-dim: var(--gr3-dark);
+  --row-live: var(--orange);
+
+  display: block;
+  position: relative;
+  padding: var(--row-pad) 0;
+  border-top: 1px solid currentColor;
+}
+
+[data-ground="dark"] .idx-row {
+  --row-fill: var(--wh);
+  --row-ink: var(--bk);
+  --row-dim: var(--gr3);
+  --row-live: var(--ac);
+}
+
+.idx-in {
+  display: flex;
+  gap: 20rem;
+  align-items: baseline;
+}
+
+/*
+ * Grown a pixel past the row on both edges so the fill swallows its own hairline
+ * and the next row's, then given that pixel back as padding so its copy of
+ * .idx-in lands exactly on the live one underneath.
+ */
+.idx-veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: calc(100% + 2px);
+  padding-top: calc(var(--row-pad) + 1px);
+  background-color: var(--row-fill);
+  color: var(--row-ink);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.72s var(--ease-ref);
+  pointer-events: none;
+}
+
+.idx-veil .dim {
+  color: var(--row-dim);
+}
+
+.idx-veil .live {
+  color: var(--row-live);
+}
+
+/* Enter and leave share an origin, so the fill comes in from the left and goes
+ * back out to the left rather than travelling across -- unlike .link, which
+ * flips its origin to sweep through. */
+@media (hover: hover) {
+  .idx-row:hover > .idx-veil {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .idx-row {
+    --row-pad: 22rem;
+  }
+
+  .idx-in {
+    flex-wrap: wrap;
+    gap: 8rem 14rem;
+  }
+}
+
+/* The two cells this page's rows use: a label, and its date pushed to the far
+ * edge. */
+.row-title {
+  flex: 1;
+}
+
+.row-meta {
+  margin-left: auto;
+  flex: none;
+}
+
+@media (max-width: 767.98px) {
+  .row-meta {
+    margin-left: 0;
+  }
+}
+
+/*
+ * =============================================================================
+ * DARK SECTIONS
+ * =============================================================================
+ * The page goes dark by painting individual sections, not by holding a theme.
+ * There is no state, no toggle and no JavaScript: a section opts in and every
+ * rule, link underline and button border inside it follows, because all of them
+ * are drawn in currentColor. The header needs no involvement either -- its
+ * mix-blend-mode difference already inverts it over any ground.
+ */
+[data-ground="dark"] {
+  background-color: var(--bk);
+  color: var(--wh);
+}
+
+[data-ground="dark"] .dim {
+  color: var(--gr3-dark);
+}
+
+/* On black the real brand orange clears 8.9:1, so live state can use it. */
+[data-ground="dark"] .live {
+  color: var(--orange);
+}
+
+[data-ground="dark"] ::selection {
+  background: var(--orange);
+  color: var(--bk);
+}
+
+/*
+ * =============================================================================
+ * HEADER
+ * =============================================================================
+ * Fixed, with no background of its own.
+ *
+ * `mix-blend-mode: difference` over white text is what lets one header sit over
+ * the artwork, over white sections and over the black ones without any of them
+ * knowing about it: the blend inverts against whatever is behind, so the header
+ * is black on white and white on black for free.
+ *
+ * The lockup is set at 500 because it has to hold its shape over the artwork.
+ * Switzer is loaded as a variable face, so that is real weight rather than a
+ * synthesised one -- which `font-synthesis-weight: none` would refuse to draw.
+ *
+ * There is no nav. This is one page; there is nowhere to navigate.
+ */
+.hd {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 60;
+  width: 100%;
+  padding-top: 24rem;
+  padding-bottom: 24rem;
+  color: var(--wh);
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+.hd-in {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.hd-mark {
+  pointer-events: auto;
+  display: block;
+  font-size: 19rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+
+.hd-mark span {
+  display: block;
+}
+
+@media (max-width: 767.98px) {
+  .hd {
+    padding-top: 14rem;
+    padding-bottom: 14rem;
+  }
+  .hd-mark {
+    font-size: 14rem;
+  }
+}
+
+/*
+ * A 3px rule across the top that fills as the page is read. White under
+ * `difference` rather than a flat black bar, so it inverts against whatever
+ * section is at the top of the viewport instead of vanishing into a dark one.
+ */
+.prog {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 70;
+  height: 3rem;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background-color: var(--wh);
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+/*
+ * =============================================================================
+ * HERO
+ * =============================================================================
+ * The supplied key art, full bleed, with the title sitting on it. The artwork is
+ * the only colour event on the page -- everything below it is monochrome. It is
+ * the art exactly as supplied, cerulean and saffron, with no treatment over it.
+ * The title is deliberately not set at display scale here: the image is the
+ * statement, and the big type arrives in the section after it.
+ */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 560rem;
+  width: 100%;
+  overflow: hidden;
+}
+
+/*
+ * The artwork arrives as a band: closed to a zero-height sliver at the centre
+ * line until the page is entered, then opening to full bleed. Clipped in the
+ * static HTML before any script runs, and unclipped by the reduced-motion block
+ * below for anyone who has asked for less movement.
+ */
+.hero-clip {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(50% 0 50% 0);
+  transition: clip-path 1.15s var(--ease-ref) 0.08s;
+}
+
+html[data-entered] .hero-clip {
+  clip-path: inset(0 0 0 0);
+}
+
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+ * This is not a scrim over the artwork for its own sake -- it is what the header
+ * blends against. `mix-blend-mode: difference` over a mid-tone returns another
+ * mid-tone, so the lockup went muddy against the artwork exactly where it had no
+ * other ground to fall back on. Darkening the top band pushes the difference
+ * back to near-white and costs the image nothing below it.
+ */
+.hero-scrim {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 300rem;
+  background-image: linear-gradient(to bottom, rgb(0 0 0 / 0.62), rgb(0 0 0 / 0));
+  pointer-events: none;
+}
+
+.hero-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 38rem;
+}
+
+.hero-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20rem;
+  color: var(--wh);
+}
+
+.hero-meta {
+  text-align: right;
+}
+
+@media (max-width: 767.98px) {
+  .hero-body {
+    padding-bottom: 20rem;
+  }
+  .hero-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24rem;
+  }
+  .hero-meta {
+    text-align: left;
+  }
+}
+
+/*
+ * =============================================================================
+ * BLOCKS
+ * =============================================================================
+ * What the React components carried in Tailwind utilities, as named classes.
+ */
+
+/* The statement. The indent on the second line is what makes it read as a title
+ * rather than a heading. */
+.stmt {
+  display: flex;
+  flex-direction: column;
+  gap: 60rem;
+}
+
+.stmt-indent {
+  display: block;
+  padding-left: 1.6em;
+}
+
+.prose {
+  display: flex;
+  max-width: 70ch;
+  flex-direction: column;
+  gap: 26rem;
+}
+
+@media (max-width: 767.98px) {
+  .stmt {
+    gap: 40rem;
+  }
+  .stmt-indent {
+    padding-left: 0.9em;
+  }
+}
+
+/* The facts: a narrow definition list against the standing intro. */
+.facts {
+  display: flex;
+  gap: 40rem;
+}
+
+.facts-list {
+  width: 300rem;
+  flex: none;
+}
+
+.facts-list dl {
+  display: flex;
+  flex-direction: column;
+  gap: 34rem;
+}
+
+.facts-list dl > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6rem;
+}
+
+.facts-intro {
+  flex: 1;
+}
+
+@media (max-width: 767.98px) {
+  .facts {
+    flex-direction: column;
+  }
+  .facts-list {
+    width: 100%;
+  }
+  .facts-list dl {
+    gap: 26rem;
+  }
+}
+
+.note {
+  padding-top: 24rem;
+}
+
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rem;
+  padding-top: 60rem;
+}
+
+@media (max-width: 767.98px) {
+  .cta {
+    padding-top: 40rem;
+  }
+}
+
+/*
+ * =============================================================================
+ * FOOTER
+ * =============================================================================
+ * A colophon, not a directory. Where we are on the left, how to reach us on the
+ * right, and the mark. It is the page's one permanently dark surface, which is
+ * why the invitation above it arrives already dark.
+ */
+.ftr {
+  padding-top: 160rem;
+  padding-bottom: 38rem;
+}
+
+.ftr-band {
+  padding-bottom: 40rem;
+}
+
+/* Placement only, and it lives here rather than at the call site because this
+ * row does rearrange below 768px, where .grd collapses to a block stack and the
+ * two cells simply follow each other. */
+.ftr-venue {
+  grid-column: 1 / span 6;
+}
+
+.ftr-reach {
+  grid-column: 11 / span 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 18rem;
+}
+
+.ftr-meta {
+  padding-top: 40rem;
+}
+
+.ftr-meta > :nth-child(1) {
+  grid-column: 1 / span 4;
+}
+.ftr-meta > :nth-child(2) {
+  grid-column: 5 / span 5;
+}
+.ftr-meta > :nth-child(3) {
+  grid-column: 10 / span 3;
+}
+.ftr-meta > :nth-child(4) {
+  grid-column: 13 / span 3;
+}
+
+/* The two-voice lockup: the name in the sans, the qualifier in the serif. */
+.lockup {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.lockup-name {
+  line-height: 1;
+}
+
+.lockup-sub {
+  padding-top: 8rem;
+}
+
+.ftr-venue > p {
+  padding-top: 20rem;
+}
+
+@media (max-width: 767.98px) {
+  .ftr {
+    padding-top: 80rem;
+    padding-bottom: 24rem;
+  }
+  .ftr-band {
+    padding-bottom: 30rem;
+  }
+  .ftr-reach {
+    align-items: flex-start;
+    padding-top: 40rem;
+  }
+  .ftr-meta {
+    padding-top: 24rem;
+    line-height: 1.6;
+  }
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * THE WORDMARK
+ * -----------------------------------------------------------------------------
+ * The last screen of the page: four capitals gutter to gutter. Set in the sans
+ * at 500, the weight the header lockup already uses for APRU, so the giant
+ * version is the same four letters and not a second identity. Typeset rather
+ * than drawn, which keeps faith with the site's rule about not reconstructing an
+ * institution's mark.
+ *
+ * It carries its own gutters -- .ctr's, to the pixel -- rather than sitting in
+ * one, exactly as the real site has it.
+ *
+ * NO BLEND. On the site this is `mix-blend-mode: difference` so the halo's
+ * colour reads straight through the letters as the ring turns behind them. There
+ * is no halo here, and white capitals differenced against the black ground come
+ * out white -- the identical result for the cost of a compositing layer. So the
+ * letters are simply white. Restoring the ring means restoring the blend, and
+ * the z-index above the canvas with it; see .mark in codebase/app/globals.css.
+ */
+.mark {
+  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  padding: 0 30rem;
+
+  /*
+   * Solved, not eyeballed. A P R U advance 2.613em together in Switzer at 500,
+   * the gutter is 30rem a side against a root font size that is 1px at 1920, so
+   * at 34vw the four caps take ~92% of the container and `space-between` spends
+   * the remaining 8% on three gaps of about 2.7% each -- tight and even.
+   *
+   * One value, no breakpoint: the gutter is itself proportional, so the gap
+   * holds within half a percent from 1280 all the way to 2560. The clamp on the
+   * root font size is exactly why this cannot be rem.
+   */
+  font-size: 34vw;
+
+  /* Switzer's cap height is 0.738em at this weight and the leading is 0.74em, so
+   * the line box is the caps and almost nothing else: the mask hugs them, and
+   * APRU has no descender to buy room for. Tracking is off because
+   * `space-between` is already doing that job. */
+  line-height: 0.74;
+  letter-spacing: 0;
+
+  margin-top: 200rem;
+}
+
+/* .ln-mask is display:block and both selectors are (0,1,0), so this has to be
+ * declared after it to win. The clip survives, and each letter arrives with the
+ * same rise every other line of display type on the page uses. */
+.mark-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 767.98px) {
+  .mark {
+    padding: 0 15rem;
+    margin-top: 100rem;
+  }
+}
+
+/*
+ * =============================================================================
+ * REDUCED MOTION
+ * =============================================================================
+ * Reveals resolve to their end state instantly, so the page is simply a static
+ * document.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .ln-mask > .ln,
+  .ln-mask > .wd {
+    transform: none !important;
+  }
+
+  .rise {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* The hero is simply already open. */
+  .hero-clip {
+    clip-path: none !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="prog" aria-hidden="true"></div>
+
+<header class="hd">
+  <div class="ctr hd-in">
+    <a class="hd-mark" href="/">
+      <span>APRU</span>
+      <span>Sustainable Cities</span>
+      <span class="f-serif">&amp; Landscapes</span>
+    </a>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO ------------------------------------------------------------------ -->
+  <section class="hero">
+    <div class="hero-clip">
+      <picture>
+        <source
+          srcset="images/hero-1920.avif 1920w, images/hero-1280.avif 1280w, images/hero-768.avif 768w"
+          type="image/avif"
+          sizes="100vw">
+        <img
+          class="hero-img"
+          src="images/hero-768.webp"
+          width="1920"
+          height="1080"
+          alt="Aerial terrain artwork in saffron over cerulean — the visual identity of the 10th APRU Sustainable Cities and Landscapes conference.">
+      </picture>
+      <div class="hero-scrim" aria-hidden="true"></div>
+    </div>
+
+    <div class="ctr hero-body">
+      <div class="hero-row">
+        <h1 class="e-lh t-h3" data-reveal>
+          <span class="ln-mask"><span class="ln" style="transition-delay:0s">Bridging</span></span>
+          <span class="ln-mask"><span class="ln" style="transition-delay:0.08s">Resilience(s)</span></span>
+        </h1>
+        <div class="t-b2 hero-meta rise" data-reveal>
+          <p>21–23 May 2027</p>
+          <p>NUS Department of Architecture</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE THEME -------------------------------------------------------------- -->
+  <section id="theme" class="pad">
+    <div class="ctr">
+      <div class="grd">
+        <div class="lane-right-label sec-spine sec-head">
+          <p class="sec-label">The theme</p>
+        </div>
+
+        <div class="lane-right-body">
+          <div class="stmt">
+            <h2 class="e-lh t-h2" data-reveal>
+              <span class="ln-mask"><span class="ln" style="transition-delay:0s">Bridging</span></span>
+              <span class="ln-mask"><span class="ln stmt-indent" style="transition-delay:0.08s">Resilience(s)</span></span>
+            </h2>
+
+            <div class="t-b1 prose" data-reveal>
+              <p class="rise">
+                Amid climate change, economic and technological uncertainties, and social and
+                environmental disruptions, cities and communities across the Pacific Rim are
+                facing profound and unprecedented challenges. In addressing these challenges,
+                however, the knowledge and practices of sustainable planning, governance, and
+                design often remain siloed and fragmented.
+              </p>
+              <p class="rise" style="transition-delay:0.08s">
+                With the theme of Bridging Resilience(s), the 2027 APRU-SCL conference will
+                explore how different knowledges and practices can connect and coalesce in
+                advancing social, cultural, and environmental resilience in cities and
+                communities. It will further examine how bridging itself — the ability to
+                network, organize, co-create, and forge connections — can represent a form of
+                resilience in the face of crisis and disruption.
+              </p>
+              <p class="rise" style="transition-delay:0.16s">
+                Singapore, with its unique institutional structure along with the challenges of
+                density and land scarcity, provides a setting for this discussion. For the 2027
+                conference, we welcome submissions of papers, posters, and panels that examine
+                solutions and challenges facing urban and environmental sustainability in the
+                Pacific Rim through transdisciplinary collaboration, comparative studies, and
+                cross-cultural investigation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE FACTS -------------------------------------------------------------- -->
+  <section id="facts" class="pad">
+    <div class="ctr">
+      <div class="grd">
+        <div class="lane-left-body">
+          <div class="facts">
+            <div class="facts-list" data-reveal>
+              <dl>
+                <div class="rise">
+                  <dt class="t-lbl dim">Dates</dt>
+                  <dd class="t-b2">21–23 May 2027</dd>
+                </div>
+                <div class="rise" style="transition-delay:0.06s">
+                  <dt class="t-lbl dim">Location</dt>
+                  <dd class="t-b2">Kent Ridge campus, Singapore</dd>
+                </div>
+                <div class="rise" style="transition-delay:0.12s">
+                  <dt class="t-lbl dim">Host</dt>
+                  <dd class="t-b2">NUS Department of Architecture, College of Design and Engineering</dd>
+                </div>
+                <div class="rise" style="transition-delay:0.18s">
+                  <dt class="t-lbl dim">Series</dt>
+                  <dd class="t-b2">The 10th Conference of APRU-SCL</dd>
+                </div>
+              </dl>
+            </div>
+
+            <!-- Wraps, so it rises rather than being masked. -->
+            <div class="facts-intro" data-reveal>
+              <p class="t-h4 rise">
+                The Department of Architecture at the National University of Singapore is proud
+                to host the 10th Annual APRU Sustainable Cities and Landscapes (SCL) Conference
+                on 21–23 May 2027. The conference will celebrate the 10th anniversary of the
+                growing network of scholars, educators, practitioners, and community partners in
+                the Pacific Rim.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEY DATES -------------------------------------------------------------- -->
+  <!--
+    `.live` marks the one row that is actually settled. That is the accent's only
+    job on the whole site, so a confirmed date is the single coloured word on the
+    page -- which is what makes it read as information rather than decoration.
+    Every other milestone is null in content/dates.json; when one is filled in
+    there it is filled in here too.
+  -->
+  <section id="key-dates" class="pad pad-flow">
+    <div class="ctr">
+      <div class="grd">
+        <div class="lane-right-label sec-spine sec-head">
+          <p class="sec-label">Key dates</p>
+        </div>
+
+        <div class="lane-right-body">
+          <div class="rulelist" data-reveal>
+            <div class="idx-row">
+              <div class="idx-in rise" style="transition-delay:0s">
+                <span class="t-b1 row-title">Call for abstracts opens</span>
+                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+              </div>
+              <div class="idx-veil" aria-hidden="true">
+                <div class="idx-in">
+                  <span class="t-b1 row-title">Call for abstracts opens</span>
+                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="idx-row">
+              <div class="idx-in rise" style="transition-delay:0.06s">
+                <span class="t-b1 row-title">Abstract submission deadline</span>
+                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+              </div>
+              <div class="idx-veil" aria-hidden="true">
+                <div class="idx-in">
+                  <span class="t-b1 row-title">Abstract submission deadline</span>
+                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="idx-row">
+              <div class="idx-in rise" style="transition-delay:0.12s">
+                <span class="t-b1 row-title">Notification of acceptance</span>
+                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+              </div>
+              <div class="idx-veil" aria-hidden="true">
+                <div class="idx-in">
+                  <span class="t-b1 row-title">Notification of acceptance</span>
+                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="idx-row">
+              <div class="idx-in rise" style="transition-delay:0.18s">
+                <span class="t-b1 row-title">Registration opens</span>
+                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+              </div>
+              <div class="idx-veil" aria-hidden="true">
+                <div class="idx-in">
+                  <span class="t-b1 row-title">Registration opens</span>
+                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="idx-row">
+              <div class="idx-in rise" style="transition-delay:0.24s">
+                <span class="t-b1 row-title">Early-bird registration closes</span>
+                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+              </div>
+              <div class="idx-veil" aria-hidden="true">
+                <div class="idx-in">
+                  <span class="t-b1 row-title">Early-bird registration closes</span>
+                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="idx-row">
+              <div class="idx-in rise" style="transition-delay:0.3s">
+                <span class="t-b1 row-title">Conference</span>
+                <span class="t-b2 row-meta"><span class="tnum live">21 May 2027</span></span>
+              </div>
+              <div class="idx-veil" aria-hidden="true">
+                <div class="idx-in">
+                  <span class="t-b1 row-title">Conference</span>
+                  <span class="t-b2 row-meta"><span class="tnum live">21 May 2027</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="t-b2 dim note">
+            Deadlines are being finalised. Each will be confirmed here as it is set.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE INVITATION --------------------------------------------------------- -->
+  <!--
+    The page goes dark here and stays dark. On the real site a 200vh pinned
+    curtain wipes it black; that needs a scroll driver a holding page has not
+    earned, and this is the same end state. It has to happen somewhere: the
+    footer is permanently dark, so a page that ended light would butt onto it at
+    a hard seam.
+  -->
+  <section id="join" class="pad" data-ground="dark">
+    <div class="ctr">
+      <div class="grd">
+        <div class="lane-right-body">
+          <h2 class="e-lh t-h1" data-reveal>
+            <span class="ln-mask"><span class="ln" style="transition-delay:0s">Join us in</span></span>
+            <span class="ln-mask"><span class="ln" style="transition-delay:0.08s">Singapore, 2027.</span></span>
+          </h2>
+          <div class="cta rise" data-reveal>
+            <span class="btn btn-pending dim" title="This link will be published shortly">Registration open soon</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="ftr" data-ground="dark">
+  <div class="ctr">
+    <!-- One band. Venue left, contact right -- set as a single row on the fifteen
+         rather than as columns, because two facts do not make a directory. -->
+    <div class="grd ftr-band" data-reveal>
+      <div class="ftr-venue rise">
+        <span class="lockup">
+          <span class="t-h4 lockup-name">NUS</span>
+          <span class="t-b2 dim f-serif lockup-sub">Department of Architecture · CDE</span>
+        </span>
+        <p class="t-b2 dim">Kent Ridge campus, Singapore</p>
+      </div>
+
+      <div class="ftr-reach rise" style="transition-delay:0.1s">
+        <!-- [OPEN] No conference address is published yet, and CONTENT-REVIEW.md
+             rules out publishing individual ones. Replace this line with
+             <a class="t-b1 link" href="mailto:…">…</a> once there is a general
+             address. -->
+        <p class="t-b1 dim">Contact details to follow</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- The mark, and it sits OUTSIDE the container, carrying .ctr's gutters
+       itself -- see THE WORDMARK. -->
+  <div class="mark ln-mask mark-row" data-reveal>
+    <span class="wd" style="transition-delay:0s">A</span>
+    <span class="wd" style="transition-delay:0.09s">P</span>
+    <span class="wd" style="transition-delay:0.18s">R</span>
+    <span class="wd" style="transition-delay:0.27s">U</span>
+  </div>
+
+  <div class="ctr">
+    <div class="grd ftr-meta t-b2 dim rise" data-reveal>
+      <p>The 10th Conference of APRU-SCL</p>
+      <p>NUS Department of Architecture, College of Design and Engineering</p>
+      <p>21–23 May 2027 · Singapore</p>
+      <p class="tnum">© 2027 NUS Department of Architecture</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/*
+ * Three behaviours, no dependencies.
+ *
+ * Reveals are CSS transitions, not JS animations: the elements already carry
+ * their end-state classes, and all this does is add `.is-in` once, which
+ * releases every mask and rise inside. That is the same contract as
+ * components/motion/Reveal.tsx in the codebase, down to the observer's margins.
+ */
+(function () {
+  var root = document.documentElement;
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Opens .hero-clip, so the artwork arrives as a widening band. The real site
+  // holds this until the preloader's panels retract; there is no loading screen
+  // here, so it fires on the first frame.
+  requestAnimationFrame(function () {
+    root.dataset.entered = "";
+  });
+
+  var nodes = document.querySelectorAll("[data-reveal]");
+
+  if (reduced || !("IntersectionObserver" in window)) {
+    // Belt and braces: without an observer the page must still be readable.
+    Array.prototype.forEach.call(nodes, function (node) {
+      node.classList.add("is-in");
+    });
+  } else {
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.05 }
+    );
+    Array.prototype.forEach.call(nodes, function (node) {
+      observer.observe(node);
+    });
+  }
+
+  var bar = document.querySelector(".prog");
+  var onScroll = function () {
+    var max = root.scrollHeight - window.innerHeight;
+    bar.style.transform = "scaleX(" + (max > 0 ? window.scrollY / max : 0) + ")";
+  };
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+})();
+</script>
+
+</body>
+</html>
