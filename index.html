@@ -365,6 +365,24 @@ img {
   grid-row: 1;
 }
 
+/* The closing statement, one column in from the page gutter. Not the body lane:
+ * "in Singapore." is 969rem and cols 3-10 are 982rem, which is close enough that
+ * a wrap inside .ln-mask is one font tweak away -- and MASKED REVEAL forbids it.
+ * Column 2 leaves 1735rem, which the statement and the clock both clear.
+ *
+ * This is a THIRD left edge, deliberately: 30 for the page's own furniture
+ * (header, hero, labels, footer, wordmark), 281 for body text, and this. */
+.lane-close {
+  grid-column: 2 / span 14;
+
+  /* So the clock can be sized against THIS box rather than against the viewport;
+   * see .cd-line. The lane is not a fixed fraction of the window -- the gutter
+   * and the fourteen gaps are all rem, and rem sits on its clamp floor below
+   * about 1728, so the lane runs from 0.866 of the viewport at 768 to 0.904 at
+   * 1920. One vw number cannot serve both ends; one cqw number is exact. */
+  container-type: inline-size;
+}
+
 /*
  * -----------------------------------------------------------------------------
  * SECTION RHYTHM
@@ -389,12 +407,15 @@ img {
  * -----------------------------------------------------------------------------
  * VERTICAL SECTION LABEL
  * -----------------------------------------------------------------------------
- * Reads bottom-to-top down the left column. writing-mode plus a 180 turn is what
- * gets bottom-to-top -- vertical-rl on its own reads top-to-bottom.
+ * Reads top-to-bottom down the left column, which is what vertical-rl gives on
+ * its own -- Latin glyphs laid on their side, turned a quarter clockwise.
+ *
+ * NO 180 TURN. Adding one flips the axis to bottom-to-top, and the label has to
+ * read the same way as the vertical title beside it. The title cannot carry that
+ * turn at all; see VERTICAL TITLE for why.
  */
 .sec-label {
   writing-mode: vertical-rl;
-  transform: rotate(180deg);
   font-family: var(--font-hedvig), ui-serif, Georgia, serif;
   font-size: 80rem;
   letter-spacing: -0.03em;
@@ -405,7 +426,6 @@ img {
 @media (max-width: 767.98px) {
   .sec-label {
     writing-mode: horizontal-tb;
-    transform: none;
     font-size: 22rem;
   }
   .sec-head {
@@ -435,14 +455,16 @@ img {
  * -----------------------------------------------------------------------------
  * VERTICAL TITLE
  * -----------------------------------------------------------------------------
- * The theme's title, turned on its side: two columns reading bottom-to-top,
+ * The theme's title, turned on its side: two columns reading top-to-bottom,
  * pushed against the right gutter, with the body text centred against their
- * height. Same mechanism as .sec-label above -- vertical-rl for the axis, the
- * 180 turn for the direction.
+ * height. Same mechanism as .sec-label above, and the same axis.
  *
- * "Bridging" is the LEFT column. Turn a bottom-to-top block back 90 degrees to
- * read it and the leftmost column becomes the top line, so this is the order
- * that reads rather than the order that looks symmetrical.
+ * NO TRANSFORM HERE, EVER. .rise sets `transform` on the element it is on, and
+ * `.is-in .rise` (0,2,0) outranks `.vtitle > span` (0,1,1), so the instant a
+ * reveal resolved it wrote `transform: none` over the rotation and the title
+ * flipped 180 degrees mid-animation. Any transform on these spans is one
+ * specificity accident away from being cancelled, so the writing mode carries
+ * the whole job and the title carries no reveal. See the call site.
  *
  * line-height is the column WIDTH here, not the leading: in vertical writing the
  * two axes trade places. Latin glyphs are laid on their side, so a column needs
@@ -450,20 +472,29 @@ img {
  */
 .vtitle {
   display: flex;
-  justify-content: flex-end;
+
+  /* "Bridging" is the first line, and on a top-to-bottom axis the first line is
+   * the RIGHTMOST column -- turn the page a quarter anticlockwise to read it and
+   * the right edge becomes the top. The markup still runs Bridging first, which
+   * is both the reading order and what the mobile stack needs, so the reversal
+   * belongs to the layout rather than to the source. */
+  flex-direction: row-reverse;
+
+  /* row-reverse puts main-start at the RIGHT edge, so flex-start -- not
+   * flex-end -- is what holds the pair against the right gutter. */
+  justify-content: flex-start;
 
   /* Not the default stretch. Stretched, both columns take the height of the
    * longer one and the type floats inside a box it does not fill, so the two
-   * lines start at different heights. flex-end makes each box hug its own line
-   * and puts both first letters on one bottom edge -- which is what the left
-   * edge of a pair of horizontal lines does. */
-  align-items: flex-end;
+   * lines start at different heights. flex-start makes each box hug its own line
+   * and puts both first letters on the one top guide the section's label sits
+   * on -- which is what the left edge of a pair of horizontal lines does. */
+  align-items: flex-start;
   gap: 16rem;
 }
 
 .vtitle > span {
   writing-mode: vertical-rl;
-  transform: rotate(180deg);
   line-height: 1.2;
   white-space: nowrap;
 }
@@ -488,7 +519,6 @@ img {
   .vtitle > span {
     display: block;
     writing-mode: horizontal-tb;
-    transform: none;
     line-height: 0.9;
   }
   .vtitle > span:last-child {
@@ -901,12 +931,12 @@ html[data-entered] .hero-clip {
 }
 
 /*
- * The closing statement. The rule under it is a border rather than a standalone
- * hairline for the same reason the deleted index rows drew theirs that way: in
- * currentColor it inverts with the ground it is on, and it divides the statement
- * from the status beneath without either of them owning a spare element.
- */
-/*
+ * The closing statement. Nothing divides it from the button and the deadlines
+ * line beneath -- the dark ground already reads as one surface, and a hairline
+ * across a screen this quiet is one more thing than it needs. The padding the
+ * rule used to sit on stays: only the line was in the way, not the air, and
+ * without it the descenders of "in Singapore." come down onto the button.
+ *
  * font-size is capped in vw, not rem, for the same reason .mark is: the root
  * font size stops shrinking at its clamp floor around 1728, so below that rem
  * no longer tracks the viewport. "in Singapore." is ~7.25em wide, and at 175rem
@@ -916,27 +946,34 @@ html[data-entered] .hero-clip {
  * root clamp and the viewport is worst.
  */
 .jn {
-  border-bottom: 1px solid currentColor;
   padding-bottom: 40rem;
   font-size: min(175rem, 12vw);
 }
 
 /*
  * The countdown, which is the middle of that sentence rather than a widget above
- * it: figures in the sans, unit words in the serif, sitting on one baseline
- * because they are inline siblings in a single line box.
+ * it: the whole line is set in the serif that the sentence is set in, figures at
+ * display size and unit words small beside them, sitting on one baseline because
+ * they are inline siblings in a single line box.
  *
- * font-size has to be restated here even though every child sets its own. The
- * line box is struck from the PARENT's size, and the parent is a 175rem heading,
- * so without this the line would reserve display leading it never uses.
+ * The line owns the size and the children take theirs in em, so one cap governs
+ * the pair. It has to be restated here at all because the line box is struck
+ * from the PARENT's size, and the parent is a 175rem heading -- without it the
+ * line would reserve display leading it never uses.
  *
- * It is set in .live, and that is not decoration -- live state is the accent's
- * one job on this site, and a running clock is the literal case of it. On the
- * dark ground .live resolves to the brand orange at 8.9:1, so the countdown is
- * the only coloured thing below the artwork.
+ * NO BOLD. Hedvig ships a single 400 face and font-synthesis-weight is off for
+ * the page, so font-weight on it draws nothing; the emphasis is scale.
  *
- * .tnum is load-bearing, not a nicety: without tabular figures every digit that
- * changes re-measures the line and the whole sentence twitches once a second.
+ * ACCENT ON THE FIGURES ONLY. Live state is the accent's one job on this site
+ * and a running clock is the literal case of it, but at this size the whole line
+ * in orange is a colour field rather than a signal. The digits -- the part that
+ * is actually live -- carry it, and the unit words stay in the sentence.
+ *
+ * THE LINE MOVES, AND THAT IS ACCEPTED. Hedvig's digits are proportional and the
+ * face carries no tnum feature, so font-variant-numeric buys nothing: at 120px
+ * "00" measures 143.3 and "11" measures 85.0, against a flat 137.5 for every
+ * pair in Switzer. The seconds re-measure once a second and the words after them
+ * shift. Setting the figures in the serif is the requirement; this is its price.
  *
  * Hidden in the static markup and unhidden by script -- and `display: block`
  * beats the UA's [hidden] rule, so that has to be restated or the empty line
@@ -944,10 +981,22 @@ html[data-entered] .hero-clip {
  */
 /* A plain margin is correct next to the masks above and below, even though they
  * carry negative ones: .e-lh's negative margin exactly cancels its own --off
- * padding, so the 48 is measured from the neighbouring line's ink either way. */
+ * padding, so the 48 is measured from the neighbouring line's ink either way.
+ *
+ * The cap exists for the same reason .jn's and .mark's do -- below about 1728
+ * the root font size sits on its clamp floor and rem stops tracking the window
+ * -- but it is in cqw, not vw, because what this line has to fit inside is the
+ * lane, and the lane is not a fixed fraction of the viewport (see .lane-close).
+ * Measured in vw it wrapped from 1280 down.
+ *
+ * Size it for the WIDEST the line can ever be, all zeros --
+ * "00 months 00 days 00 hours 00 minutes 00 seconds" -- which measures 10.8x the
+ * figure size, not for whatever figures happen to be showing. 9.2cqw is that
+ * ratio with a little air, and it lands within half a pixel of the intended
+ * 160rem at 1920 while still holding one line at 768. */
 .cd-line {
   display: block;
-  font-size: 80rem;
+  font-size: min(160rem, 9.2cqw);
   line-height: 1;
   margin: 48rem 0;
 }
@@ -958,35 +1007,34 @@ html[data-entered] .hero-clip {
 }
 
 .cd-n {
-  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
-  font-size: 80rem;
-  font-weight: 500;
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+  font-size: 1em;
   letter-spacing: -0.03em;
 }
 
 /* Tight to its own figure, open to the next pair -- which is what groups the
- * five pairs into five words instead of ten. */
+ * five pairs into five words instead of ten. In em, so the whole pair scales
+ * with the one cap on .cd-line. */
 .cd-u {
   font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 26rem;
+  font-size: 0.2625em;
   letter-spacing: 0;
-  padding: 0 18rem 0 8rem;
+  padding: 0 0.1125em 0 0.05em;
 }
 
 @media (max-width: 767.98px) {
   /* All five pairs will not hold one line at 375, so the line is allowed to take
    * two -- it is not inside a mask, and nothing here depends on its height. */
   .cd-line {
-    font-size: 34rem;
+    font-size: 40rem;
     line-height: 1.4;
     margin: 28rem 0;
   }
-  .cd-n {
-    font-size: 34rem;
-  }
+  /* A looser ratio than the desktop 0.2625: at this size the unit words have to
+   * stay readable rather than stay proportional. */
   .cd-u {
-    font-size: 13rem;
-    padding: 0 10rem 0 5rem;
+    font-size: 0.33em;
+    padding: 0 0.25em 0 0.12em;
   }
   .jn {
     padding-bottom: 28rem;
@@ -1238,15 +1286,25 @@ html[data-entered] .hero-clip {
         </div>
 
         <!--
-          .rise, not .ln-mask. A mask's box has to be exactly one line-height
-          tall -- see MASKED REVEAL -- and a rotated line's box is the length of
-          the whole line, some 770px of it, so both the travel and the descender
-          arithmetic would be meaningless here.
+          NO REVEAL ON THIS ONE, and it is not a style preference. .rise sets
+          `transform` on the element it is on, and `.is-in .rise` outranks
+          `.vtitle > span`, so the reveal resolving wrote `transform: none` over
+          the title's rotation and flipped it 180 degrees as it arrived. A mask
+          is no use either: a mask's box has to be exactly one line-height tall
+          (see MASKED REVEAL) and a vertical line's box is the whole line, some
+          600px of it. So the title simply is, which is also what the label it
+          now shares a guide with does.
+
+          .sec-spine holds it under the header on the same guide as "The theme".
+          It has no travel today -- the grid row and the title are both 607rem
+          tall, so it pins and unpins in the same instant -- and it is declared
+          anyway, so the two vertical elements behave alike the moment this
+          section is ever given more height than its title.
         -->
-        <div class="lane-title">
-          <h2 class="t-h2 vtitle" data-reveal>
-            <span class="rise">Bridging</span>
-            <span class="rise" style="transition-delay:0.1s">Resilience(s)</span>
+        <div class="lane-title sec-spine">
+          <h2 class="t-h2 vtitle">
+            <span>Bridging</span>
+            <span>Resilience(s)</span>
           </h2>
         </div>
 
@@ -1278,46 +1336,50 @@ html[data-entered] .hero-clip {
   -->
   <section id="join" class="pad" data-ground="dark">
     <!--
-      Full width, not the eight-column lane the rest of the page keeps to. At
-      t-h1 "in Singapore." is wider than that lane and would wrap, and a wrapping
-      line inside .ln-mask breaks the clip -- see MASKED REVEAL. Full width also
-      sets the statement's left edge on the wordmark below it rather than on the
-      body text above it, which is the right neighbour for a closing line.
+      One column in from the page gutter, not the eight-column lane the rest of
+      the page keeps to: at t-h1 "in Singapore." is 969rem against that lane's
+      982rem, close enough that a wrap is one font tweak away -- and a wrapping
+      line inside .ln-mask breaks the clip, see MASKED REVEAL. Column 2 leaves
+      the statement and the clock room and still holds them off the edge.
     -->
     <div class="ctr">
-      <h2 class="e-lh t-h1 jn" data-reveal>
-        <span class="ln-mask"><span class="ln" style="transition-delay:0s">Join us in</span></span>
+      <div class="grd">
+        <div class="lane-close">
+          <h2 class="e-lh t-h1 jn" data-reveal>
+            <span class="ln-mask"><span class="ln" style="transition-delay:0s">Join us in</span></span>
 
-        <!--
-          The clock is inside the sentence, so the heading reads "Join us in
-          8 months 21 days in Singapore." -- the finer units are aria-hidden and
-          nothing is a live region, so it is spoken once rather than every second.
+            <!--
+              The clock is inside the sentence, so the heading reads "Join us in
+              8 months 21 days in Singapore." -- the finer units are aria-hidden and
+              nothing is a live region, so it is spoken once rather than every second.
 
-          `hidden` in the static markup and unhidden by script: without JS the
-          two serif lines simply close up, with no gap and nothing lost, since
-          the date is already in the hero and in the footer.
-        -->
-        <span class="cd-line live rise" data-countdown data-target="2027-05-20T16:00:00Z"
-              style="transition-delay:0.08s" hidden>
-            <span class="cd-part" data-cd-part="months"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
-            <span class="cd-part" data-cd-part="days"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
-            <span class="cd-part" data-cd-part="hours" aria-hidden="true"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
-            <span class="cd-part" data-cd-part="minutes" aria-hidden="true"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
-            <span class="cd-part" data-cd-part="seconds" aria-hidden="true"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
-        </span>
+              `hidden` in the static markup and unhidden by script: without JS the
+              two serif lines simply close up, with no gap and nothing lost, since
+              the date is already in the hero and in the footer.
+            -->
+            <span class="cd-line rise" data-countdown data-target="2027-05-20T16:00:00Z"
+                  style="transition-delay:0.08s" hidden>
+                <span class="cd-part" data-cd-part="months"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
+                <span class="cd-part" data-cd-part="days"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
+                <span class="cd-part" data-cd-part="hours" aria-hidden="true"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
+                <span class="cd-part" data-cd-part="minutes" aria-hidden="true"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
+                <span class="cd-part" data-cd-part="seconds" aria-hidden="true"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
+            </span>
 
-        <span class="ln-mask"><span class="ln" style="transition-delay:0.16s">in Singapore.</span></span>
-      </h2>
+            <span class="ln-mask"><span class="ln" style="transition-delay:0.16s">in Singapore.</span></span>
+          </h2>
 
-      <div class="cta rise" data-reveal>
-        <span class="btn btn-pending dim" title="This link will be published shortly">Registrations open soon!</span>
+          <div class="cta rise" data-reveal>
+            <span class="btn btn-pending dim" title="This link will be published shortly">Registrations open soon!</span>
+          </div>
+
+          <!-- What the six-row Key Dates table used to say, in the one line it was
+               actually saying it in. -->
+          <p class="t-b2 dim note">
+            Call for abstracts, registration and submission deadlines will be announced here.
+          </p>
+        </div>
       </div>
-
-      <!-- What the six-row Key Dates table used to say, in the one line it was
-           actually saying it in. -->
-      <p class="t-b2 dim note">
-        Call for abstracts, registration and submission deadlines will be announced here.
-      </p>
     </div>
   </section>
 
