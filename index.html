@@ -347,22 +347,32 @@ img {
  */
 .lane-right-label {
   grid-column: 1 / span 2;
+
+  /* Both rows. A sticky item can only travel inside its own grid area, so a
+   * spine that occupied row 1 alone would have nothing to hold against while
+   * row 2 scrolled past it. */
+  grid-row: 1 / span 2;
 }
 .lane-right-body {
   grid-column: 3 / span 8;
+  grid-row: 2;
 }
 
-/* The theme's title cell, hard against the right gutter. Column 11 is left
- * empty on purpose -- it is the air between the body and the vertical title.
+/* The theme's title, on its own row above the body and running to the right
+ * gutter. It starts at column 3 rather than column 1 so its left edge is the
+ * body's, and it is set flush right, so the heading arrives at the far edge of
+ * the screen and the paragraph begins at the near one.
  *
- * grid-row is not redundant. Auto-placement is sparse by default: it walks the
- * items in DOM order and never moves the cursor backwards, so the body -- which
- * comes after this in the source, because that is the order mobile has to stack
- * them in -- would be pushed to a second row rather than back to column 3.
- * Naming the row for both of them is what keeps them side by side. */
+ * The rows are named rather than left to auto-placement: placement is sparse by
+ * default and never moves the cursor backwards, so naming them is what keeps
+ * the label's two-row span from pushing anything sideways. */
 .lane-title {
-  grid-column: 12 / span 4;
+  grid-column: 3 / span 13;
   grid-row: 1;
+
+  /* On top of the grid's own 20rem row gap, for the 40 a heading wants between
+   * itself and the text it introduces. */
+  margin-bottom: 20rem;
 }
 
 /* The closing statement, one column in from the page gutter. Not the body lane:
@@ -388,8 +398,9 @@ img {
  * SECTION RHYTHM
  * -----------------------------------------------------------------------------
  * 100 a side, not the site's 180. This page is three screens by intent, and the
- * seams at 180 spend most of a fourth on nothing. 100 is the floor: below it the
- * sections stop reading as separate surfaces and the page becomes one column.
+ * seams at 180 spend most of a fourth on nothing. 100 is the floor for a section
+ * that fills a screen -- under it those stop reading as separate surfaces and
+ * the page becomes one column. A short section can go below it; see .pad-sm.
  */
 .pad {
   padding-top: 100rem;
@@ -400,6 +411,23 @@ img {
   .pad {
     padding-top: 60rem;
     padding-bottom: 60rem;
+  }
+}
+
+/* The theme screen only, and the exception the floor above allows for. Its
+ * content is 375rem tall now that the title lies down, and 100 a side would be
+ * more padding than section. The seam still reads without it: white meets the
+ * artwork above and the black closing screen below, so the change of ground
+ * carries what the air used to. */
+.pad-sm {
+  padding-top: 70rem;
+  padding-bottom: 70rem;
+}
+
+@media (max-width: 767.98px) {
+  .pad-sm {
+    padding-top: 50rem;
+    padding-bottom: 50rem;
   }
 }
 
@@ -453,75 +481,37 @@ img {
 
 /*
  * -----------------------------------------------------------------------------
- * VERTICAL TITLE
+ * THE THEME'S TITLE
  * -----------------------------------------------------------------------------
- * The theme's title, turned on its side: two columns reading top-to-bottom,
- * pushed against the right gutter, with the body text centred against their
- * height. Same mechanism as .sec-label above, and the same axis.
+ * Two lines, flush right against the page gutter, above the paragraph.
  *
- * NO TRANSFORM HERE, EVER. .rise sets `transform` on the element it is on, and
- * `.is-in .rise` (0,2,0) outranks `.vtitle > span` (0,1,1), so the instant a
- * reveal resolved it wrote `transform: none` over the rotation and the title
- * flipped 180 degrees mid-animation. Any transform on these spans is one
- * specificity accident away from being cancelled, so the writing mode carries
- * the whole job and the title carries no reveal. See the call site.
+ * It was set vertically for a while, and that is what cost this screen its
+ * height: a vertical line is as tall as its word is long, so "Resilience(s)"
+ * alone made the section 607rem before any padding was added. Lying down, the
+ * same two lines are 212rem, and the height stops depending on how long the
+ * words happen to be. "The theme" beside it stays vertical -- one turned
+ * element on a screen reads as a device, two read as a system this page does
+ * not otherwise have.
  *
- * line-height is the column WIDTH here, not the leading: in vertical writing the
- * two axes trade places. Latin glyphs are laid on their side, so a column needs
- * roughly the font's full ink height (~1.2em) or the two columns collide.
+ * The spans are blocks because they are lines, not because of the alignment:
+ * left inline they would set as one line and break wherever the measure ran out.
  */
-.vtitle {
-  display: flex;
-
-  /* "Bridging" is the first line, and on a top-to-bottom axis the first line is
-   * the RIGHTMOST column -- turn the page a quarter anticlockwise to read it and
-   * the right edge becomes the top. The markup still runs Bridging first, which
-   * is both the reading order and what the mobile stack needs, so the reversal
-   * belongs to the layout rather than to the source. */
-  flex-direction: row-reverse;
-
-  /* row-reverse puts main-start at the RIGHT edge, so flex-start -- not
-   * flex-end -- is what holds the pair against the right gutter. */
-  justify-content: flex-start;
-
-  /* Not the default stretch. Stretched, both columns take the height of the
-   * longer one and the type floats inside a box it does not fill, so the two
-   * lines start at different heights. flex-start makes each box hug its own line
-   * and puts both first letters on the one top guide the section's label sits
-   * on -- which is what the left edge of a pair of horizontal lines does. */
-  align-items: flex-start;
-  gap: 16rem;
+.ttl {
+  text-align: right;
 }
 
-.vtitle > span {
-  writing-mode: vertical-rl;
-  line-height: 1.2;
-  white-space: nowrap;
+.ttl > span {
+  display: block;
 }
 
-/*
- * The body sits against the middle of the title's height rather than its top.
- * align-self only bites on a grid item, so this is inert under 768px where .grd
- * is a block stack -- which is right: stacked, there is nothing to centre in.
- * grid-row pairs with .lane-title's; see the note there.
- */
-.sec-mid {
-  align-self: center;
-  grid-row: 1;
-}
-
-/* Under 768px the title lies back down, exactly as .sec-label does, and the
- * indent on the second line returns the look it had as a horizontal heading. */
+/* Under 768px .grd is a block stack, the heading is the widest thing on the
+ * screen, and flush right would hang it off the edge the eye reads from. Back to
+ * the left, with the second line indented -- the shape it has always had here. */
 @media (max-width: 767.98px) {
-  .vtitle {
-    display: block;
+  .ttl {
+    text-align: left;
   }
-  .vtitle > span {
-    display: block;
-    writing-mode: horizontal-tb;
-    line-height: 0.9;
-  }
-  .vtitle > span:last-child {
+  .ttl > span:last-child {
     padding-left: 0.9em;
   }
   .lane-title {
@@ -947,7 +937,7 @@ html[data-entered] .hero-clip {
  */
 .jn {
   padding-bottom: 40rem;
-  font-size: min(175rem, 12vw);
+  font-size: min(130rem, 9vw);
 }
 
 /*
@@ -991,12 +981,13 @@ html[data-entered] .hero-clip {
  *
  * Size it for the WIDEST the line can ever be, all zeros --
  * "00 months 00 days 00 hours 00 minutes 00 seconds" -- which measures 10.8x the
- * figure size, not for whatever figures happen to be showing. 9.2cqw is that
- * ratio with a little air, and it lands within half a pixel of the intended
- * 160rem at 1920 while still holding one line at 768. */
+ * figure size, not for whatever figures happen to be showing. The gaps between
+ * figure and word are inside that measurement, so widening them narrows the
+ * figures: at these gaps the line is 11.55x the figure size, and 8.6cqw is that
+ * ratio with a little air. */
 .cd-line {
   display: block;
-  font-size: min(160rem, 9.2cqw);
+  font-size: min(160rem, 8.6cqw);
   line-height: 1;
   margin: 48rem 0;
 }
@@ -1013,13 +1004,32 @@ html[data-entered] .hero-clip {
 }
 
 /* Tight to its own figure, open to the next pair -- which is what groups the
- * five pairs into five words instead of ten. In em, so the whole pair scales
- * with the one cap on .cd-line. */
+ * five pairs into five words instead of ten.
+ *
+ * BOTH GAPS ARE MEASURED IN THE em OF THE LINE, not of the word. An em on .cd-u
+ * is 0.2625 of the line, so a gap written on it comes out about a quarter of
+ * what it reads as -- which is exactly how the figures ended up touching their
+ * words. .cd-n and .cd-part both inherit the line's size, so their padding says
+ * what it means. Every 1rem of gap costs about 1rem off the figures, because the
+ * cap below is sized to the finished line. */
 .cd-u {
   font-family: var(--font-hedvig), ui-serif, Georgia, serif;
   font-size: 0.2625em;
   letter-spacing: 0;
-  padding: 0 0.1125em 0 0.05em;
+}
+
+.cd-n {
+  padding-right: 0.07em;
+}
+
+.cd-part {
+  padding-right: 0.15em;
+}
+
+/* Nothing follows the last pair, and its trailing gap is width the figures could
+ * have had instead. */
+.cd-part:last-child {
+  padding-right: 0;
 }
 
 @media (max-width: 767.98px) {
@@ -1034,7 +1044,6 @@ html[data-entered] .hero-clip {
    * stay readable rather than stay proportional. */
   .cd-u {
     font-size: 0.33em;
-    padding: 0 0.25em 0 0.12em;
   }
   .jn {
     padding-bottom: 28rem;
@@ -1273,7 +1282,7 @@ html[data-entered] .hero-clip {
   </section>
 
   <!-- THE THEME -------------------------------------------------------------- -->
-  <section id="theme" class="pad">
+  <section id="theme" class="pad-sm">
     <div class="ctr">
       <!--
         DOM order is label, title, body -- which is what the mobile stack wants,
@@ -1286,29 +1295,19 @@ html[data-entered] .hero-clip {
         </div>
 
         <!--
-          NO REVEAL ON THIS ONE, and it is not a style preference. .rise sets
-          `transform` on the element it is on, and `.is-in .rise` outranks
-          `.vtitle > span`, so the reveal resolving wrote `transform: none` over
-          the title's rotation and flipped it 180 degrees as it arrived. A mask
-          is no use either: a mask's box has to be exactly one line-height tall
-          (see MASKED REVEAL) and a vertical line's box is the whole line, some
-          600px of it. So the title simply is, which is also what the label it
-          now shares a guide with does.
-
-          .sec-spine holds it under the header on the same guide as "The theme".
-          It has no travel today -- the grid row and the title are both 607rem
-          tall, so it pins and unpins in the same instant -- and it is declared
-          anyway, so the two vertical elements behave alike the moment this
-          section is ever given more height than its title.
+          No reveal on this one. It arrives with the screen rather than into it,
+          which is what "The theme" beside it has always done -- and between two
+          elements sharing a screen this quiet, one animating and one not reads
+          as an oversight rather than as a stagger.
         -->
-        <div class="lane-title sec-spine">
-          <h2 class="t-h2 vtitle">
+        <div class="lane-title">
+          <h2 class="t-h2 ttl">
             <span>Bridging</span>
             <span>Resilience(s)</span>
           </h2>
         </div>
 
-        <div class="lane-right-body sec-mid">
+        <div class="lane-right-body">
           <div class="t-b1 prose" data-reveal>
             <p class="rise">
               Amid climate change, economic and technological uncertainty, and social and
