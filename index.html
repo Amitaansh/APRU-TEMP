@@ -352,6 +352,19 @@ img {
   grid-column: 3 / span 8;
 }
 
+/* The theme's title cell, hard against the right gutter. Column 11 is left
+ * empty on purpose -- it is the air between the body and the vertical title.
+ *
+ * grid-row is not redundant. Auto-placement is sparse by default: it walks the
+ * items in DOM order and never moves the cursor backwards, so the body -- which
+ * comes after this in the source, because that is the order mobile has to stack
+ * them in -- would be pushed to a second row rather than back to column 3.
+ * Naming the row for both of them is what keeps them side by side. */
+.lane-title {
+  grid-column: 12 / span 4;
+  grid-row: 1;
+}
+
 /*
  * -----------------------------------------------------------------------------
  * SECTION RHYTHM
@@ -415,6 +428,74 @@ img {
     position: sticky;
     top: calc(var(--hdr) + 40rem);
     align-self: start;
+  }
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * VERTICAL TITLE
+ * -----------------------------------------------------------------------------
+ * The theme's title, turned on its side: two columns reading bottom-to-top,
+ * pushed against the right gutter, with the body text centred against their
+ * height. Same mechanism as .sec-label above -- vertical-rl for the axis, the
+ * 180 turn for the direction.
+ *
+ * "Bridging" is the LEFT column. Turn a bottom-to-top block back 90 degrees to
+ * read it and the leftmost column becomes the top line, so this is the order
+ * that reads rather than the order that looks symmetrical.
+ *
+ * line-height is the column WIDTH here, not the leading: in vertical writing the
+ * two axes trade places. Latin glyphs are laid on their side, so a column needs
+ * roughly the font's full ink height (~1.2em) or the two columns collide.
+ */
+.vtitle {
+  display: flex;
+  justify-content: flex-end;
+
+  /* Not the default stretch. Stretched, both columns take the height of the
+   * longer one and the type floats inside a box it does not fill, so the two
+   * lines start at different heights. flex-end makes each box hug its own line
+   * and puts both first letters on one bottom edge -- which is what the left
+   * edge of a pair of horizontal lines does. */
+  align-items: flex-end;
+  gap: 16rem;
+}
+
+.vtitle > span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/*
+ * The body sits against the middle of the title's height rather than its top.
+ * align-self only bites on a grid item, so this is inert under 768px where .grd
+ * is a block stack -- which is right: stacked, there is nothing to centre in.
+ * grid-row pairs with .lane-title's; see the note there.
+ */
+.sec-mid {
+  align-self: center;
+  grid-row: 1;
+}
+
+/* Under 768px the title lies back down, exactly as .sec-label does, and the
+ * indent on the second line returns the look it had as a horizontal heading. */
+@media (max-width: 767.98px) {
+  .vtitle {
+    display: block;
+  }
+  .vtitle > span {
+    display: block;
+    writing-mode: horizontal-tb;
+    transform: none;
+    line-height: 0.9;
+  }
+  .vtitle > span:last-child {
+    padding-left: 0.9em;
+  }
+  .lane-title {
+    margin-bottom: 28rem;
   }
 }
 
@@ -795,33 +876,11 @@ html[data-entered] .hero-clip {
  * What the React components carried in Tailwind utilities, as named classes.
  */
 
-/* The statement. The indent on the second line is what makes it read as a title
- * rather than a heading. */
-.stmt {
-  display: flex;
-  flex-direction: column;
-  gap: 40rem;
-}
-
-.stmt-indent {
-  display: block;
-  padding-left: 1.6em;
-}
-
 .prose {
   display: flex;
   max-width: 70ch;
   flex-direction: column;
   gap: 26rem;
-}
-
-@media (max-width: 767.98px) {
-  .stmt {
-    gap: 28rem;
-  }
-  .stmt-indent {
-    padding-left: 0.9em;
-  }
 }
 
 .note {
@@ -842,8 +901,34 @@ html[data-entered] .hero-clip {
 }
 
 /*
- * The countdown. This is the page's whole answer to "when": a day figure at
- * display scale over a ticking hh:mm:ss.
+ * The closing statement. The rule under it is a border rather than a standalone
+ * hairline for the same reason the deleted index rows drew theirs that way: in
+ * currentColor it inverts with the ground it is on, and it divides the statement
+ * from the status beneath without either of them owning a spare element.
+ */
+/*
+ * font-size is capped in vw, not rem, for the same reason .mark is: the root
+ * font size stops shrinking at its clamp floor around 1728, so below that rem
+ * no longer tracks the viewport. "in Singapore." is ~7.25em wide, and at 175rem
+ * it overruns the container everywhere under about 1150 -- and an overrun line
+ * WRAPS INSIDE ITS MASK, which is the one thing MASKED REVEAL forbids. 12vw is
+ * the largest cap that still holds the line at 768, where the gap between the
+ * root clamp and the viewport is worst.
+ */
+.jn {
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 40rem;
+  font-size: min(175rem, 12vw);
+}
+
+/*
+ * The countdown, which is the middle of that sentence rather than a widget above
+ * it: figures in the sans, unit words in the serif, sitting on one baseline
+ * because they are inline siblings in a single line box.
+ *
+ * font-size has to be restated here even though every child sets its own. The
+ * line box is struck from the PARENT's size, and the parent is a 175rem heading,
+ * so without this the line would reserve display leading it never uses.
  *
  * It is set in .live, and that is not decoration -- live state is the accent's
  * one job on this site, and a running clock is the literal case of it. On the
@@ -851,41 +936,61 @@ html[data-entered] .hero-clip {
  * the only coloured thing below the artwork.
  *
  * .tnum is load-bearing, not a nicety: without tabular figures every digit that
- * changes re-measures the line and the whole block twitches once a second.
+ * changes re-measures the line and the whole sentence twitches once a second.
  *
- * Hidden in the static markup and unhidden by script -- and `display: flex`
- * beats the UA's [hidden] rule, so that has to be restated here or the empty
- * box shows for anyone without JS.
+ * Hidden in the static markup and unhidden by script -- and `display: block`
+ * beats the UA's [hidden] rule, so that has to be restated or the empty line
+ * opens a gap between the two serif lines for anyone without JS.
  */
-.cd {
-  display: flex;
-  flex-direction: column;
-  gap: 6rem;
-  padding-bottom: 40rem;
+/* A plain margin is correct next to the masks above and below, even though they
+ * carry negative ones: .e-lh's negative margin exactly cancels its own --off
+ * padding, so the 48 is measured from the neighbouring line's ink either way. */
+.cd-line {
+  display: block;
+  font-size: 80rem;
+  line-height: 1;
+  margin: 48rem 0;
 }
 
-.cd[hidden],
-.cd-clock[hidden] {
+.cd-line[hidden],
+.cd-part[hidden] {
   display: none;
 }
 
-.cd-num {
+.cd-n {
   font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
-  font-size: 175rem;
+  font-size: 80rem;
   font-weight: 500;
-  line-height: 0.85;
   letter-spacing: -0.03em;
 }
 
-@media (max-width: 767.98px) {
-  .cd {
-    padding-bottom: 32rem;
-  }
+/* Tight to its own figure, open to the next pair -- which is what groups the
+ * five pairs into five words instead of ten. */
+.cd-u {
+  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
+  font-size: 26rem;
+  letter-spacing: 0;
+  padding: 0 18rem 0 8rem;
+}
 
-  /* Larger than the mobile .t-h1 (40rem), deliberately. That size is set for a
-   * heading that has to wrap; this is three digits that never will. */
-  .cd-num {
-    font-size: 88rem;
+@media (max-width: 767.98px) {
+  /* All five pairs will not hold one line at 375, so the line is allowed to take
+   * two -- it is not inside a mask, and nothing here depends on its height. */
+  .cd-line {
+    font-size: 34rem;
+    line-height: 1.4;
+    margin: 28rem 0;
+  }
+  .cd-n {
+    font-size: 34rem;
+  }
+  .cd-u {
+    font-size: 13rem;
+    padding: 0 10rem 0 5rem;
+  }
+  .jn {
+    padding-bottom: 28rem;
+    font-size: 40rem;
   }
 }
 
@@ -1122,30 +1227,41 @@ html[data-entered] .hero-clip {
   <!-- THE THEME -------------------------------------------------------------- -->
   <section id="theme" class="pad">
     <div class="ctr">
+      <!--
+        DOM order is label, title, body -- which is what the mobile stack wants,
+        since .grd is a block there. Desktop puts them in their columns instead,
+        so the title lands on the right with the body centred against it.
+      -->
       <div class="grd">
         <div class="lane-right-label sec-spine sec-head">
           <p class="sec-label">The theme</p>
         </div>
 
-        <div class="lane-right-body">
-          <div class="stmt">
-            <h2 class="e-lh t-h2" data-reveal>
-              <span class="ln-mask"><span class="ln" style="transition-delay:0s">Bridging</span></span>
-              <span class="ln-mask"><span class="ln stmt-indent" style="transition-delay:0.08s">Resilience(s)</span></span>
-            </h2>
+        <!--
+          .rise, not .ln-mask. A mask's box has to be exactly one line-height
+          tall -- see MASKED REVEAL -- and a rotated line's box is the length of
+          the whole line, some 770px of it, so both the travel and the descender
+          arithmetic would be meaningless here.
+        -->
+        <div class="lane-title">
+          <h2 class="t-h2 vtitle" data-reveal>
+            <span class="rise">Bridging</span>
+            <span class="rise" style="transition-delay:0.1s">Resilience(s)</span>
+          </h2>
+        </div>
 
-            <div class="t-b1 prose" data-reveal>
-              <p class="rise">
-                Amid climate change, economic and technological uncertainty, and social and
-                environmental disruption, cities across the Pacific Rim face unprecedented
-                challenges — yet the knowledge and practices of sustainable planning,
-                governance and design remain siloed. The 2027 conference explores how they
-                connect, and how bridging itself becomes a form of resilience.
-              </p>
-              <p class="t-lbl dim rise" style="transition-delay:0.08s">
-                The 10th Annual APRU Sustainable Cities and Landscapes Conference.
-              </p>
-            </div>
+        <div class="lane-right-body sec-mid">
+          <div class="t-b1 prose" data-reveal>
+            <p class="rise">
+              Amid climate change, economic and technological uncertainty, and social and
+              environmental disruption, cities across the Pacific Rim face unprecedented
+              challenges — yet the knowledge and practices of sustainable planning,
+              governance and design remain siloed. The 2027 conference explores how they
+              connect, and how bridging itself becomes a form of resilience.
+            </p>
+            <p class="t-lbl dim rise" style="transition-delay:0.08s">
+              The 10th Annual APRU Sustainable Cities and Landscapes Conference.
+            </p>
           </div>
         </div>
       </div>
@@ -1161,45 +1277,47 @@ html[data-entered] .hero-clip {
     a hard seam.
   -->
   <section id="join" class="pad" data-ground="dark">
+    <!--
+      Full width, not the eight-column lane the rest of the page keeps to. At
+      t-h1 "in Singapore." is wider than that lane and would wrap, and a wrapping
+      line inside .ln-mask breaks the clip -- see MASKED REVEAL. Full width also
+      sets the statement's left edge on the wordmark below it rather than on the
+      body text above it, which is the right neighbour for a closing line.
+    -->
     <div class="ctr">
-      <div class="grd">
-        <div class="lane-right-body">
+      <h2 class="e-lh t-h1 jn" data-reveal>
+        <span class="ln-mask"><span class="ln" style="transition-delay:0s">Join us in</span></span>
 
-          <!--
-            The countdown carries the one thing a holding page owes its reader.
-            `hidden` in the static markup and unhidden by script, so a visitor
-            without JS gets no empty box and loses no information: the date is
-            already in the hero, in the heading below it and in the footer.
-          -->
-          <div class="cd rise" data-reveal data-countdown data-target="2027-05-20T16:00:00Z" hidden>
-            <p class="cd-num live tnum" data-cd-days></p>
-            <p class="t-lbl dim">days until Singapore</p>
-            <p class="t-b2 dim tnum cd-clock" data-cd-hms aria-hidden="true" hidden></p>
-          </div>
+        <!--
+          The clock is inside the sentence, so the heading reads "Join us in
+          8 months 21 days in Singapore." -- the finer units are aria-hidden and
+          nothing is a live region, so it is spoken once rather than every second.
 
-          <!--
-            Three masks, not two. At t-h1 "Singapore, 2027." is wider than the
-            eight-column lane and wraps, and a wrapping line inside .ln-mask
-            breaks the clip arithmetic -- see MASKED REVEAL. One mask per line
-            the type actually takes.
-          -->
-          <h2 class="e-lh t-h1" data-reveal>
-            <span class="ln-mask"><span class="ln" style="transition-delay:0s">Join us in</span></span>
-            <span class="ln-mask"><span class="ln" style="transition-delay:0.08s">Singapore,</span></span>
-            <span class="ln-mask"><span class="ln" style="transition-delay:0.16s">2027.</span></span>
-          </h2>
+          `hidden` in the static markup and unhidden by script: without JS the
+          two serif lines simply close up, with no gap and nothing lost, since
+          the date is already in the hero and in the footer.
+        -->
+        <span class="cd-line live rise" data-countdown data-target="2027-05-20T16:00:00Z"
+              style="transition-delay:0.08s" hidden>
+            <span class="cd-part" data-cd-part="months"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
+            <span class="cd-part" data-cd-part="days"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
+            <span class="cd-part" data-cd-part="hours" aria-hidden="true"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
+            <span class="cd-part" data-cd-part="minutes" aria-hidden="true"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
+            <span class="cd-part" data-cd-part="seconds" aria-hidden="true"><span class="cd-n tnum" data-cd-v></span><span class="cd-u"></span></span>
+        </span>
 
-          <div class="cta rise" data-reveal>
-            <span class="btn btn-pending dim" title="This link will be published shortly">Registrations open soon!</span>
-          </div>
+        <span class="ln-mask"><span class="ln" style="transition-delay:0.16s">in Singapore.</span></span>
+      </h2>
 
-          <!-- What the six-row Key Dates table used to say, in the one line it
-               was actually saying it in. -->
-          <p class="t-b2 dim note">
-            Call for abstracts, registration and submission deadlines will be announced here.
-          </p>
-        </div>
+      <div class="cta rise" data-reveal>
+        <span class="btn btn-pending dim" title="This link will be published shortly">Registrations open soon!</span>
       </div>
+
+      <!-- What the six-row Key Dates table used to say, in the one line it was
+           actually saying it in. -->
+      <p class="t-b2 dim note">
+        Call for abstracts, registration and submission deadlines will be announced here.
+      </p>
     </div>
   </section>
 
@@ -1291,57 +1409,87 @@ html[data-entered] .hero-clip {
   }
 
   /*
-   * The countdown to the first morning in Singapore.
+   * The countdown, which is the middle of the sentence around it.
    *
    * The target is midnight of 21 May 2027 in Singapore, which is UTC+8 and has
    * no daylight saving, so the instant is fixed: 2027-05-20T16:00:00Z. It lives
    * in data-target rather than here, so the date is edited in one place.
    *
-   * The block is revealed only while the target is still ahead, which makes the
-   * markup's `hidden` the correct end state after the conference as well as
-   * before the script runs.
+   * MONTHS ARE CALENDAR ARITHMETIC, not division. A month is not 30 days, and
+   * over a run this long dividing would be days out. addMonths steps whole
+   * calendar months and clamps to the end of a short one, so the 31st does not
+   * overflow into the next month the way setMonth alone would.
    *
-   * Under reduced motion the day figure is rendered once and the clock line
-   * stays hidden -- a number that redraws every second is movement, whatever it
-   * happens to be counting. The seconds line is aria-hidden and neither line is
-   * a live region, so nothing here is announced on a timer.
+   * Leading units drop off while they are zero -- it never reads "00 months
+   * 21 days" -- but an interior zero stays, so "08 months 00 days 04 hours" is
+   * intact.
+   *
+   * Under reduced motion only months and days are rendered and no interval runs.
+   * Freezing the finer units would be worse than leaving them out: a still
+   * "36 minutes 53 seconds" is wrong within the minute, while the coarse ones
+   * stay true for as long as the page is open.
    */
-  var cd = document.querySelector("[data-countdown]");
-  var target = cd ? Date.parse(cd.getAttribute("data-target")) : NaN;
+  var line = document.querySelector("[data-countdown]");
+  var target = line ? Date.parse(line.getAttribute("data-target")) : NaN;
 
-  if (cd && !isNaN(target)) {
-    var days = cd.querySelector("[data-cd-days]");
-    var clock = cd.querySelector("[data-cd-hms]");
+  if (line && !isNaN(target)) {
+    var parts = Array.prototype.slice.call(line.querySelectorAll(".cd-part"));
+
+    // months and days -- the two that are still true a minute from now
+    var COARSE = 2;
+
+    var addMonths = function (d, n) {
+      var r = new Date(d.getTime());
+      r.setFullYear(d.getFullYear(), d.getMonth() + n, 1);
+      var last = new Date(r.getFullYear(), r.getMonth() + 1, 0).getDate();
+      r.setDate(Math.min(d.getDate(), last));
+      return r;
+    };
 
     var pad2 = function (n) {
       return (n < 10 ? "0" : "") + n;
     };
 
     var tick = function () {
-      var ms = target - Date.now();
+      var now = new Date();
+      var shown = false;
 
-      if (ms <= 0) {
-        cd.hidden = true;
-        return false;
+      if (target - now.getTime() > 0) {
+        var months = 0;
+        while (addMonths(now, months + 1).getTime() <= target) months++;
+
+        var ms = target - addMonths(now, months).getTime();
+        var values = [
+          months,
+          Math.floor(ms / 864e5),
+          Math.floor(ms / 36e5) % 24,
+          Math.floor(ms / 6e4) % 60,
+          Math.floor(ms / 1e3) % 60
+        ];
+
+        parts.forEach(function (part, i) {
+          var v = values[i];
+          var use = (shown || v > 0) && (!reduced || i < COARSE);
+
+          part.hidden = !use;
+          if (!use) return;
+
+          shown = true;
+
+          var word = part.getAttribute("data-cd-part");
+          part.querySelector("[data-cd-v]").textContent = pad2(v);
+          part.querySelector(".cd-u").textContent = v === 1 ? word.slice(0, -1) : word;
+        });
       }
 
-      days.textContent = String(Math.floor(ms / 864e5));
-      clock.textContent =
-        pad2(Math.floor(ms / 36e5) % 24) +
-        ":" +
-        pad2(Math.floor(ms / 6e4) % 60) +
-        ":" +
-        pad2(Math.floor(ms / 1e3) % 60);
-
-      return true;
+      // Nothing left to count, or nothing left that this reader is being shown:
+      // the line goes away and the two serif lines close up over it.
+      line.hidden = !shown;
+      return shown;
     };
 
-    if (tick()) {
-      cd.hidden = false;
-      if (!reduced) {
-        clock.hidden = false;
-        setInterval(tick, 1000);
-      }
+    if (tick() && !reduced) {
+      setInterval(tick, 1000);
     }
   }
 
