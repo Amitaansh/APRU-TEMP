@@ -341,7 +341,9 @@ img {
  * geometry is kept exactly (see COLUMNS in components/ui/Section.tsx):
  *
  *   right  ->  halo in cols 11-15, label in 1-2, body in 3-10
- *   left   ->  halo in cols 1-5,   label in 6-7, body in 8-15
+ *
+ * Only the right lane survives here: the page is short enough that alternating
+ * sides would read as restlessness rather than as rhythm.
  */
 .lane-right-label {
   grid-column: 1 / span 2;
@@ -349,33 +351,24 @@ img {
 .lane-right-body {
   grid-column: 3 / span 8;
 }
-.lane-left-body {
-  grid-column: 8 / span 8;
-}
 
 /*
  * -----------------------------------------------------------------------------
  * SECTION RHYTHM
  * -----------------------------------------------------------------------------
- * .pad-flow is for a section that continues the one above it -- it drops the top
- * pad so two blocks read as one, instead of paying 180 twice at the seam.
+ * 100 a side, not the site's 180. This page is three screens by intent, and the
+ * seams at 180 spend most of a fourth on nothing. 100 is the floor: below it the
+ * sections stop reading as separate surfaces and the page becomes one column.
  */
 .pad {
-  padding-top: 180rem;
-  padding-bottom: 180rem;
-}
-
-.pad-flow {
-  padding-top: 0;
+  padding-top: 100rem;
+  padding-bottom: 100rem;
 }
 
 @media (max-width: 767.98px) {
   .pad {
-    padding-top: 80rem;
-    padding-bottom: 80rem;
-  }
-  .pad-flow {
-    padding-top: 0;
+    padding-top: 60rem;
+    padding-bottom: 60rem;
   }
 }
 
@@ -595,121 +588,6 @@ img {
 
 /*
  * =============================================================================
- * INDEX ROW
- * =============================================================================
- * The rule-separated row is the structural unit of the whole site -- it stands
- * in for every card grid. There are no cards.
- *
- * THE HOVER. The row inverts, with the fill sweeping in from the left and
- * retracting back to the left. It is a clip over a second copy of the row rather
- * than a background plus a colour transition, because the type has to change as
- * the edge passes it rather than all at once. `mix-blend-mode: difference` would
- * do that for free, but it inverts every colour and the accent would come out
- * cyan -- and these rows carry .live.
- *
- * THE RULES ARE BORDERS. A standalone hairline is drawn in the parent's
- * currentColor, so it would neither invert with the row nor sit under it, and
- * every filled row would carry a seam top and bottom.
- */
-.rulelist {
-  border-bottom: 1px solid currentColor;
-}
-
-.idx-row {
-  --row-pad: 34rem;
-
-  /* The inverted ground, as tokens rather than literals -- the same way .dim and
-   * .live already flip under [data-ground="dark"]. */
-  --row-fill: var(--bk);
-  --row-ink: var(--wh);
-  --row-dim: var(--gr3-dark);
-  --row-live: var(--orange);
-
-  display: block;
-  position: relative;
-  padding: var(--row-pad) 0;
-  border-top: 1px solid currentColor;
-}
-
-[data-ground="dark"] .idx-row {
-  --row-fill: var(--wh);
-  --row-ink: var(--bk);
-  --row-dim: var(--gr3);
-  --row-live: var(--ac);
-}
-
-.idx-in {
-  display: flex;
-  gap: 20rem;
-  align-items: baseline;
-}
-
-/*
- * Grown a pixel past the row on both edges so the fill swallows its own hairline
- * and the next row's, then given that pixel back as padding so its copy of
- * .idx-in lands exactly on the live one underneath.
- */
-.idx-veil {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -1px;
-  height: calc(100% + 2px);
-  padding-top: calc(var(--row-pad) + 1px);
-  background-color: var(--row-fill);
-  color: var(--row-ink);
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.72s var(--ease-ref);
-  pointer-events: none;
-}
-
-.idx-veil .dim {
-  color: var(--row-dim);
-}
-
-.idx-veil .live {
-  color: var(--row-live);
-}
-
-/* Enter and leave share an origin, so the fill comes in from the left and goes
- * back out to the left rather than travelling across -- unlike .link, which
- * flips its origin to sweep through. */
-@media (hover: hover) {
-  .idx-row:hover > .idx-veil {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-@media (max-width: 767.98px) {
-  .idx-row {
-    --row-pad: 22rem;
-  }
-
-  .idx-in {
-    flex-wrap: wrap;
-    gap: 8rem 14rem;
-  }
-}
-
-/* The two cells this page's rows use: a label, and its date pushed to the far
- * edge. */
-.row-title {
-  flex: 1;
-}
-
-.row-meta {
-  margin-left: auto;
-  flex: none;
-}
-
-@media (max-width: 767.98px) {
-  .row-meta {
-    margin-left: 0;
-  }
-}
-
-/*
- * =============================================================================
  * DARK SECTIONS
  * =============================================================================
  * The page goes dark by painting individual sections, not by holding a theme.
@@ -922,7 +800,7 @@ html[data-entered] .hero-clip {
 .stmt {
   display: flex;
   flex-direction: column;
-  gap: 60rem;
+  gap: 40rem;
 }
 
 .stmt-indent {
@@ -939,49 +817,10 @@ html[data-entered] .hero-clip {
 
 @media (max-width: 767.98px) {
   .stmt {
-    gap: 40rem;
+    gap: 28rem;
   }
   .stmt-indent {
     padding-left: 0.9em;
-  }
-}
-
-/* The facts: a narrow definition list against the standing intro. */
-.facts {
-  display: flex;
-  gap: 40rem;
-}
-
-.facts-list {
-  width: 300rem;
-  flex: none;
-}
-
-.facts-list dl {
-  display: flex;
-  flex-direction: column;
-  gap: 34rem;
-}
-
-.facts-list dl > div {
-  display: flex;
-  flex-direction: column;
-  gap: 6rem;
-}
-
-.facts-intro {
-  flex: 1;
-}
-
-@media (max-width: 767.98px) {
-  .facts {
-    flex-direction: column;
-  }
-  .facts-list {
-    width: 100%;
-  }
-  .facts-list dl {
-    gap: 26rem;
   }
 }
 
@@ -993,12 +832,60 @@ html[data-entered] .hero-clip {
   display: flex;
   flex-wrap: wrap;
   gap: 16rem;
-  padding-top: 60rem;
+  padding-top: 40rem;
 }
 
 @media (max-width: 767.98px) {
   .cta {
     padding-top: 40rem;
+  }
+}
+
+/*
+ * The countdown. This is the page's whole answer to "when": a day figure at
+ * display scale over a ticking hh:mm:ss.
+ *
+ * It is set in .live, and that is not decoration -- live state is the accent's
+ * one job on this site, and a running clock is the literal case of it. On the
+ * dark ground .live resolves to the brand orange at 8.9:1, so the countdown is
+ * the only coloured thing below the artwork.
+ *
+ * .tnum is load-bearing, not a nicety: without tabular figures every digit that
+ * changes re-measures the line and the whole block twitches once a second.
+ *
+ * Hidden in the static markup and unhidden by script -- and `display: flex`
+ * beats the UA's [hidden] rule, so that has to be restated here or the empty
+ * box shows for anyone without JS.
+ */
+.cd {
+  display: flex;
+  flex-direction: column;
+  gap: 6rem;
+  padding-bottom: 40rem;
+}
+
+.cd[hidden],
+.cd-clock[hidden] {
+  display: none;
+}
+
+.cd-num {
+  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
+  font-size: 175rem;
+  font-weight: 500;
+  line-height: 0.85;
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 767.98px) {
+  .cd {
+    padding-bottom: 32rem;
+  }
+
+  /* Larger than the mobile .t-h1 (40rem), deliberately. That size is set for a
+   * heading that has to wrap; this is three digits that never will. */
+  .cd-num {
+    font-size: 88rem;
   }
 }
 
@@ -1011,7 +898,7 @@ html[data-entered] .hero-clip {
  * why the invitation above it arrives already dark.
  */
 .ftr {
-  padding-top: 160rem;
+  padding-top: 90rem;
   padding-bottom: 38rem;
 }
 
@@ -1071,7 +958,7 @@ html[data-entered] .hero-clip {
 
 @media (max-width: 767.98px) {
   .ftr {
-    padding-top: 80rem;
+    padding-top: 60rem;
     padding-bottom: 24rem;
   }
   .ftr-band {
@@ -1131,7 +1018,7 @@ html[data-entered] .hero-clip {
   line-height: 0.74;
   letter-spacing: 0;
 
-  margin-top: 200rem;
+  margin-top: 60rem;
 }
 
 /* .ln-mask is display:block and both selectors are (0,1,0), so this has to be
@@ -1145,7 +1032,7 @@ html[data-entered] .hero-clip {
 @media (max-width: 767.98px) {
   .mark {
     padding: 0 15rem;
-    margin-top: 100rem;
+    margin-top: 60rem;
   }
 }
 
@@ -1249,177 +1136,17 @@ html[data-entered] .hero-clip {
 
             <div class="t-b1 prose" data-reveal>
               <p class="rise">
-                Amid climate change, economic and technological uncertainties, and social and
-                environmental disruptions, cities and communities across the Pacific Rim are
-                facing profound and unprecedented challenges. In addressing these challenges,
-                however, the knowledge and practices of sustainable planning, governance, and
-                design often remain siloed and fragmented.
+                Amid climate change, economic and technological uncertainty, and social and
+                environmental disruption, cities across the Pacific Rim face unprecedented
+                challenges — yet the knowledge and practices of sustainable planning,
+                governance and design remain siloed. The 2027 conference explores how they
+                connect, and how bridging itself becomes a form of resilience.
               </p>
-              <p class="rise" style="transition-delay:0.08s">
-                With the theme of Bridging Resilience(s), the 2027 APRU-SCL conference will
-                explore how different knowledges and practices can connect and coalesce in
-                advancing social, cultural, and environmental resilience in cities and
-                communities. It will further examine how bridging itself — the ability to
-                network, organize, co-create, and forge connections — can represent a form of
-                resilience in the face of crisis and disruption.
-              </p>
-              <p class="rise" style="transition-delay:0.16s">
-                Singapore, with its unique institutional structure along with the challenges of
-                density and land scarcity, provides a setting for this discussion. For the 2027
-                conference, we welcome submissions of papers, posters, and panels that examine
-                solutions and challenges facing urban and environmental sustainability in the
-                Pacific Rim through transdisciplinary collaboration, comparative studies, and
-                cross-cultural investigation.
+              <p class="t-lbl dim rise" style="transition-delay:0.08s">
+                The 10th Annual APRU Sustainable Cities and Landscapes Conference.
               </p>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- THE FACTS -------------------------------------------------------------- -->
-  <section id="facts" class="pad">
-    <div class="ctr">
-      <div class="grd">
-        <div class="lane-left-body">
-          <div class="facts">
-            <div class="facts-list" data-reveal>
-              <dl>
-                <div class="rise">
-                  <dt class="t-lbl dim">Dates</dt>
-                  <dd class="t-b2">21–23 May 2027</dd>
-                </div>
-                <div class="rise" style="transition-delay:0.06s">
-                  <dt class="t-lbl dim">Location</dt>
-                  <dd class="t-b2">Kent Ridge campus, Singapore</dd>
-                </div>
-                <div class="rise" style="transition-delay:0.12s">
-                  <dt class="t-lbl dim">Host</dt>
-                  <dd class="t-b2">NUS Department of Architecture, College of Design and Engineering</dd>
-                </div>
-                <div class="rise" style="transition-delay:0.18s">
-                  <dt class="t-lbl dim">Series</dt>
-                  <dd class="t-b2">The 10th Conference of APRU-SCL</dd>
-                </div>
-              </dl>
-            </div>
-
-            <!-- Wraps, so it rises rather than being masked. -->
-            <div class="facts-intro" data-reveal>
-              <p class="t-h4 rise">
-                The Department of Architecture at the National University of Singapore is proud
-                to host the 10th Annual APRU Sustainable Cities and Landscapes (SCL) Conference
-                on 21–23 May 2027. The conference will celebrate the 10th anniversary of the
-                growing network of scholars, educators, practitioners, and community partners in
-                the Pacific Rim.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- KEY DATES -------------------------------------------------------------- -->
-  <!--
-    `.live` marks the one row that is actually settled. That is the accent's only
-    job on the whole site, so a confirmed date is the single coloured word on the
-    page -- which is what makes it read as information rather than decoration.
-    Every other milestone is null in content/dates.json; when one is filled in
-    there it is filled in here too.
-  -->
-  <section id="key-dates" class="pad pad-flow">
-    <div class="ctr">
-      <div class="grd">
-        <div class="lane-right-label sec-spine sec-head">
-          <p class="sec-label">Key dates</p>
-        </div>
-
-        <div class="lane-right-body">
-          <div class="rulelist" data-reveal>
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0s">
-                <span class="t-b1 row-title">Call for abstracts opens</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Call for abstracts opens</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.06s">
-                <span class="t-b1 row-title">Abstract submission deadline</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Abstract submission deadline</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.12s">
-                <span class="t-b1 row-title">Notification of acceptance</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Notification of acceptance</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.18s">
-                <span class="t-b1 row-title">Registration opens</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Registration opens</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.24s">
-                <span class="t-b1 row-title">Early-bird registration closes</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Early-bird registration closes</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.3s">
-                <span class="t-b1 row-title">Conference</span>
-                <span class="t-b2 row-meta"><span class="tnum live">21 May 2027</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Conference</span>
-                  <span class="t-b2 row-meta"><span class="tnum live">21 May 2027</span></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <p class="t-b2 dim note">
-            Deadlines are being finalised. Each will be confirmed here as it is set.
-          </p>
         </div>
       </div>
     </div>
@@ -1437,13 +1164,40 @@ html[data-entered] .hero-clip {
     <div class="ctr">
       <div class="grd">
         <div class="lane-right-body">
+
+          <!--
+            The countdown carries the one thing a holding page owes its reader.
+            `hidden` in the static markup and unhidden by script, so a visitor
+            without JS gets no empty box and loses no information: the date is
+            already in the hero, in the heading below it and in the footer.
+          -->
+          <div class="cd rise" data-reveal data-countdown data-target="2027-05-20T16:00:00Z" hidden>
+            <p class="cd-num live tnum" data-cd-days></p>
+            <p class="t-lbl dim">days until Singapore</p>
+            <p class="t-b2 dim tnum cd-clock" data-cd-hms aria-hidden="true" hidden></p>
+          </div>
+
+          <!--
+            Three masks, not two. At t-h1 "Singapore, 2027." is wider than the
+            eight-column lane and wraps, and a wrapping line inside .ln-mask
+            breaks the clip arithmetic -- see MASKED REVEAL. One mask per line
+            the type actually takes.
+          -->
           <h2 class="e-lh t-h1" data-reveal>
             <span class="ln-mask"><span class="ln" style="transition-delay:0s">Join us in</span></span>
-            <span class="ln-mask"><span class="ln" style="transition-delay:0.08s">Singapore, 2027.</span></span>
+            <span class="ln-mask"><span class="ln" style="transition-delay:0.08s">Singapore,</span></span>
+            <span class="ln-mask"><span class="ln" style="transition-delay:0.16s">2027.</span></span>
           </h2>
+
           <div class="cta rise" data-reveal>
             <span class="btn btn-pending dim" title="This link will be published shortly">Registrations open soon!</span>
           </div>
+
+          <!-- What the six-row Key Dates table used to say, in the one line it
+               was actually saying it in. -->
+          <p class="t-b2 dim note">
+            Call for abstracts, registration and submission deadlines will be announced here.
+          </p>
         </div>
       </div>
     </div>
@@ -1487,7 +1241,7 @@ html[data-entered] .hero-clip {
     <div class="grd ftr-meta t-b2 dim rise" data-reveal>
       <p>The 10th Conference of APRU-SCL</p>
       <p>NUS Department of Architecture, College of Design and Engineering</p>
-      <p>21–23 May 2027 · Singapore</p>
+      <p>21–23 May 2027 · Kent Ridge campus, Singapore</p>
       <p class="tnum">© 2027 NUS Department of Architecture</p>
     </div>
   </div>
@@ -1495,7 +1249,7 @@ html[data-entered] .hero-clip {
 
 <script>
 /*
- * Three behaviours, no dependencies.
+ * Four behaviours, no dependencies.
  *
  * Reveals are CSS transitions, not JS animations: the elements already carry
  * their end-state classes, and all this does is add `.is-in` once, which
@@ -1534,6 +1288,61 @@ html[data-entered] .hero-clip {
     Array.prototype.forEach.call(nodes, function (node) {
       observer.observe(node);
     });
+  }
+
+  /*
+   * The countdown to the first morning in Singapore.
+   *
+   * The target is midnight of 21 May 2027 in Singapore, which is UTC+8 and has
+   * no daylight saving, so the instant is fixed: 2027-05-20T16:00:00Z. It lives
+   * in data-target rather than here, so the date is edited in one place.
+   *
+   * The block is revealed only while the target is still ahead, which makes the
+   * markup's `hidden` the correct end state after the conference as well as
+   * before the script runs.
+   *
+   * Under reduced motion the day figure is rendered once and the clock line
+   * stays hidden -- a number that redraws every second is movement, whatever it
+   * happens to be counting. The seconds line is aria-hidden and neither line is
+   * a live region, so nothing here is announced on a timer.
+   */
+  var cd = document.querySelector("[data-countdown]");
+  var target = cd ? Date.parse(cd.getAttribute("data-target")) : NaN;
+
+  if (cd && !isNaN(target)) {
+    var days = cd.querySelector("[data-cd-days]");
+    var clock = cd.querySelector("[data-cd-hms]");
+
+    var pad2 = function (n) {
+      return (n < 10 ? "0" : "") + n;
+    };
+
+    var tick = function () {
+      var ms = target - Date.now();
+
+      if (ms <= 0) {
+        cd.hidden = true;
+        return false;
+      }
+
+      days.textContent = String(Math.floor(ms / 864e5));
+      clock.textContent =
+        pad2(Math.floor(ms / 36e5) % 24) +
+        ":" +
+        pad2(Math.floor(ms / 6e4) % 60) +
+        ":" +
+        pad2(Math.floor(ms / 1e3) % 60);
+
+      return true;
+    };
+
+    if (tick()) {
+      cd.hidden = false;
+      if (!reduced) {
+        clock.hidden = false;
+        setInterval(tick, 1000);
+      }
+    }
   }
 
   var bar = document.querySelector(".prog");
