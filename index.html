@@ -342,21 +342,20 @@ img {
  *
  *   right  ->  halo in cols 11-15, label in 1-2, body in 3-10
  *
- *   left   ->  halo in cols 1-5,   label in 6-7, body in 8-15
+ * Only the right lane survives here: the page is short enough that alternating
+ * sides would read as restlessness rather than as rhythm.
  */
 .lane-right-label {
   grid-column: 1 / span 2;
+
+  /* Both rows. A sticky item can only travel inside its own grid area, so a
+   * spine that occupied row 1 alone would have nothing to hold against while
+   * row 2 scrolled past it. */
+  grid-row: 1 / span 2;
 }
 .lane-right-body {
   grid-column: 3 / span 8;
-}
-
-/* The left lane, and the only block on the page that takes it. It carries no
- * vertical label of its own, so it starts at column 8 -- where a labelled left
- * lane's body would -- and the screen reads as the near mirror of the theme
- * above it rather than as another pass down the same column. */
-.lane-left-body {
-  grid-column: 8 / span 8;
+  grid-row: 2;
 }
 
 /* The theme's title, running to the right gutter and set flush right, so the
@@ -367,24 +366,6 @@ img {
  * The rows are named rather than left to auto-placement: placement is sparse by
  * default and never moves the cursor backwards, so naming them is what keeps
  * the label's two-row span from pushing anything sideways. */
-/*
- * THE SPLIT. Two sections take these lanes and they want different shapes of
- * them: key dates is one row -- label beside table, nothing above -- while the
- * theme carries its title in a row of its own. The split is the exception, so it
- * is the one that is written down, and .grd-split on the theme's grid is what
- * asks for it.
- */
-.grd-split .lane-right-label {
-  /* Both rows. A sticky item can only travel inside its own grid area, so a
-   * spine that occupied row 1 alone would have nothing to hold against while
-   * row 2 scrolled past it. */
-  grid-row: 1 / span 2;
-}
-
-.grd-split .lane-right-body {
-  grid-row: 2;
-}
-
 .lane-title {
   grid-column: 3 / span 13;
   grid-row: 1;
@@ -412,11 +393,11 @@ img {
  * below sets it at 68rem against a label beside it set at 72.
  */
 @media (min-width: 1280px) {
-  .grd-split .lane-right-label {
+  .lane-right-label {
     grid-row: 1;
   }
 
-  .grd-split .lane-title {
+  .lane-title {
     grid-column: 9 / span 7;
     margin-bottom: 0;
   }
@@ -426,7 +407,7 @@ img {
    * rule: stacked, there is nothing to centre in. Once the theme's three
    * paragraphs are the taller of the two, this stops moving anything -- it is
    * the title that then sits against them, from the top. */
-  .grd-split .lane-right-body {
+  .lane-right-body {
     grid-column: 3 / span 6;
     grid-row: 1;
     align-self: center;
@@ -458,8 +439,7 @@ img {
  * 100 a side, not the site's 180. This page is three screens by intent, and the
  * seams at 180 spend most of a fourth on nothing. 100 is the floor for a section
  * that fills a screen -- under it those stop reading as separate surfaces and
- * the page becomes one column. A section that continues the one above it pays
- * the seam once rather than twice; see .pad-flow.
+ * the page becomes one column.
  */
 .pad {
   padding-top: 100rem;
@@ -470,21 +450,6 @@ img {
   .pad {
     padding-top: 60rem;
     padding-bottom: 60rem;
-  }
-}
-
-/* For a section that continues the one above it rather than opening a new
- * subject: it drops the top pad so the two blocks read as one surface, instead
- * of paying 100 twice at a seam that is not really there. Key dates is the
- * schedule belonging to the conference block above it, not a screen of its
- * own. */
-.pad-flow {
-  padding-top: 0;
-}
-
-@media (max-width: 767.98px) {
-  .pad-flow {
-    padding-top: 0;
   }
 }
 
@@ -985,161 +950,6 @@ html[data-entered] .hero-clip {
   gap: 26rem;
 }
 
-/* The conference block: a narrow definition list standing against the paragraph
- * it annotates. The list is a fixed 300rem rather than a fraction, because its
- * job is to be scanned -- "Dates", "Location", "Host", "Series" all sit on one
- * line at that width, and a column that grew with the viewport would start
- * wrapping the longest of them at exactly the widths where there is most room. */
-.facts {
-  display: flex;
-  gap: 40rem;
-}
-
-.facts-list {
-  width: 300rem;
-  flex: none;
-}
-
-.facts-list dl {
-  display: flex;
-  flex-direction: column;
-  gap: 34rem;
-}
-
-.facts-list dl > div {
-  display: flex;
-  flex-direction: column;
-  gap: 6rem;
-}
-
-.facts-intro {
-  flex: 1;
-}
-
-@media (max-width: 767.98px) {
-  .facts {
-    flex-direction: column;
-  }
-  .facts-list {
-    width: 100%;
-  }
-  .facts-list dl {
-    gap: 26rem;
-  }
-}
-
-/*
- * -----------------------------------------------------------------------------
- * RULE LIST
- * -----------------------------------------------------------------------------
- * The key dates table. On hover a black fill wipes in from the left and the row
- * inverts with it -- which is why each row carries a second, hidden copy of its
- * own contents rather than a background plus a colour transition: the type has
- * to change as the edge passes it rather than all at once. `mix-blend-mode:
- * difference` would do that for free, but it inverts every colour and the accent
- * would come out cyan -- and one of these rows carries .live.
- *
- * THE RULES ARE BORDERS. A standalone hairline is drawn in the parent's
- * currentColor, so it would neither invert with the row nor sit under it, and
- * every filled row would carry a seam top and bottom.
- */
-.rulelist {
-  border-bottom: 1px solid currentColor;
-}
-
-.idx-row {
-  --row-pad: 34rem;
-
-  /* The inverted ground, as tokens rather than literals -- the same way .dim and
-   * .live already flip under [data-ground="dark"]. */
-  --row-fill: var(--bk);
-  --row-ink: var(--wh);
-  --row-dim: var(--gr3-dark);
-  --row-live: var(--orange);
-
-  display: block;
-  position: relative;
-  padding: var(--row-pad) 0;
-  border-top: 1px solid currentColor;
-}
-
-[data-ground="dark"] .idx-row {
-  --row-fill: var(--wh);
-  --row-ink: var(--bk);
-  --row-dim: var(--gr3);
-  --row-live: var(--ac);
-}
-
-.idx-in {
-  display: flex;
-  gap: 20rem;
-  align-items: baseline;
-}
-
-/*
- * Grown a pixel past the row on both edges so the fill swallows its own hairline
- * and the next row's, then given that pixel back as padding so its copy of
- * .idx-in lands exactly on the live one underneath.
- */
-.idx-veil {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -1px;
-  height: calc(100% + 2px);
-  padding-top: calc(var(--row-pad) + 1px);
-  background-color: var(--row-fill);
-  color: var(--row-ink);
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.72s var(--ease-ref);
-  pointer-events: none;
-}
-
-.idx-veil .dim {
-  color: var(--row-dim);
-}
-
-.idx-veil .live {
-  color: var(--row-live);
-}
-
-/* Enter and leave share an origin, so the fill comes in from the left and goes
- * back out to the left rather than travelling across -- unlike .link, which
- * flips its origin to sweep through. */
-@media (hover: hover) {
-  .idx-row:hover > .idx-veil {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
-@media (max-width: 767.98px) {
-  .idx-row {
-    --row-pad: 22rem;
-  }
-
-  .idx-in {
-    flex-wrap: wrap;
-    gap: 8rem 14rem;
-  }
-}
-
-/* The two cells this page's rows use: a label, and its date pushed to the far
- * edge. */
-.row-title {
-  flex: 1;
-}
-
-.row-meta {
-  margin-left: auto;
-  flex: none;
-}
-
-@media (max-width: 767.98px) {
-  .row-meta {
-    margin-left: 0;
-  }
-}
-
 .note {
   padding-top: 24rem;
 }
@@ -1543,7 +1353,7 @@ html[data-entered] .hero-clip {
         and row, so above 1280 the title lands on the right with the body centred
         beside it, and below that the body drops underneath.
       -->
-      <div class="grd grd-split">
+      <div class="grd">
         <div class="lane-right-label sec-spine sec-head">
           <p class="sec-label">The theme</p>
         </div>
@@ -1588,158 +1398,6 @@ html[data-entered] .hero-clip {
               cross-cultural investigation.
             </p>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- THE CONFERENCE --------------------------------------------------------- -->
-  <!--
-    The left lane, and the page's one move across the page. No vertical label:
-    the standing paragraph is its own heading at t-h4, and a second turned word
-    on the same scroll would read as a device repeating rather than as a system.
-  -->
-  <section id="facts" class="pad">
-    <div class="ctr">
-      <div class="grd">
-        <div class="lane-left-body">
-          <div class="facts">
-            <div class="facts-list" data-reveal>
-              <dl>
-                <div class="rise">
-                  <dt class="t-lbl dim">Dates</dt>
-                  <dd class="t-b2">21–23 May 2027</dd>
-                </div>
-                <div class="rise" style="transition-delay:0.06s">
-                  <dt class="t-lbl dim">Location</dt>
-                  <dd class="t-b2">Kent Ridge campus, Singapore</dd>
-                </div>
-                <div class="rise" style="transition-delay:0.12s">
-                  <dt class="t-lbl dim">Host</dt>
-                  <dd class="t-b2">NUS Department of Architecture, College of Design and Engineering</dd>
-                </div>
-                <div class="rise" style="transition-delay:0.18s">
-                  <dt class="t-lbl dim">Series</dt>
-                  <dd class="t-b2">The 10th Conference of APRU-SCL</dd>
-                </div>
-              </dl>
-            </div>
-
-            <!-- Wraps, so it rises rather than being masked. -->
-            <div class="facts-intro" data-reveal>
-              <p class="t-h4 rise">
-                The Department of Architecture at the National University of Singapore is proud
-                to host the 10th Annual APRU Sustainable Cities and Landscapes (SCL) Conference
-                on 21–23 May 2027. The conference will celebrate the 10th anniversary of the
-                growing network of scholars, educators, practitioners, and community partners in
-                the Pacific Rim.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- KEY DATES -------------------------------------------------------------- -->
-  <!--
-    `.live` marks the one row that is actually settled. The accent has exactly one
-    job on this page -- a date that is fixed -- and it is spent here and on the
-    clock in the closing statement, which is counting down to this same row.
-    Every other milestone stays "To be confirmed" until the conference team sets
-    it, and reads dim, so the eye finds the settled one without being told.
-  -->
-  <section id="key-dates" class="pad pad-flow">
-    <div class="ctr">
-      <div class="grd">
-        <div class="lane-right-label sec-spine sec-head">
-          <p class="sec-label">Key dates</p>
-        </div>
-
-        <div class="lane-right-body">
-          <div class="rulelist" data-reveal>
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0s">
-                <span class="t-b1 row-title">Call for abstracts opens</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Call for abstracts opens</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.06s">
-                <span class="t-b1 row-title">Abstract submission deadline</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Abstract submission deadline</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.12s">
-                <span class="t-b1 row-title">Notification of acceptance</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Notification of acceptance</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.18s">
-                <span class="t-b1 row-title">Registration opens</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Registration opens</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.24s">
-                <span class="t-b1 row-title">Early-bird registration closes</span>
-                <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Early-bird registration closes</span>
-                  <span class="t-b2 row-meta"><span class="tnum dim">To be confirmed</span></span>
-                </div>
-              </div>
-            </div>
-
-            <div class="idx-row">
-              <div class="idx-in rise" style="transition-delay:0.3s">
-                <span class="t-b1 row-title">Conference</span>
-                <span class="t-b2 row-meta"><span class="tnum live">21 May 2027</span></span>
-              </div>
-              <div class="idx-veil" aria-hidden="true">
-                <div class="idx-in">
-                  <span class="t-b1 row-title">Conference</span>
-                  <span class="t-b2 row-meta"><span class="tnum live">21 May 2027</span></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <p class="t-b2 dim note">
-            Deadlines are being finalised. Each will be confirmed here as it is set.
-          </p>
         </div>
       </div>
     </div>
@@ -1791,6 +1449,11 @@ html[data-entered] .hero-clip {
           <div class="cta rise" data-reveal>
             <span class="btn btn-pending dim" title="This link will be published shortly">Registrations open soon!</span>
           </div>
+
+          <!-- The deadlines, in the one line the page is carrying them in. -->
+          <p class="t-b2 dim note">
+            Call for abstracts, registration and submission deadlines will be announced here.
+          </p>
         </div>
       </div>
     </div>
