@@ -9,7 +9,9 @@
 <link rel="canonical" href="https://apruscl2027.com/">
 
 <!-- SVG first for anything modern; the PNG is the fallback and doubles as the
-     iOS home-screen icon. Both are the APRU-SCL 2027 Singapore lockup. -->
+     iOS home-screen icon. Both are the APRU-SCL 2027 Singapore lockup, which
+     is now the only place that mark appears -- the page itself carries no
+     lockup, since the artwork already holds the APRU and NUS marks. -->
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="icon" href="icon.png" sizes="180x180">
 <link rel="apple-touch-icon" href="icon.png">
@@ -41,22 +43,26 @@
  * =============================================================================
  * One file, no build step, and no JavaScript at all.
  *
- * The whole page is one screen: a bar carrying the event lockup, the key
- * visual, and the contact block. There is nothing below the fold to reveal on
- * scroll, so the entrance is a plain CSS animation that runs on load -- which
- * is also why the page is fully readable with scripting off. The previous
- * build drove its reveals from an IntersectionObserver and rendered blank
- * without JS; that whole apparatus is gone.
+ * Two screens and nothing else. The key visual fills the first, edge to edge;
+ * scrolling past it brings up the launch notice and the department's address,
+ * and the page ends. There is no header, no lockup and no navigation -- the
+ * artwork already carries the conference title, the dates, the APRU roundel and
+ * the NUS lockup, so anything laid over it would be saying it twice.
  *
- * THE ARTWORK IS THE CONTENT. The conference title, the dates and the APRU and
- * NUS marks are all typeset INTO the supplied image. Two consequences run
- * through everything below:
- *   1. It can never be cropped -- hence `object-fit: contain` everywhere, and
- *      no full-bleed `cover`. The title runs to ~95% of the image width, so any
- *      crop at all eats into it.
- *   2. Its text is pixels, not text. The alt attribute is the only way a screen
- *      reader or a search engine gets that content, so it carries all of it
- *      verbatim rather than describing the picture.
+ * THE ARTWORK IS THE CONTENT, and that governs the one real decision here:
+ *
+ *   Its title is typeset INTO the image, in the upper left, running to about
+ *   95% of the image width. So `cover` -- which is what filling the screen
+ *   means -- is destructive by nature: every pixel of viewport aspect that
+ *   differs from the artwork's own 16:9 is taken off the sides, and the title
+ *   is what sits there. At 16:9 nothing is lost; at 16:10 it just reaches the
+ *   first and last letters; on a portrait phone it would remove the title
+ *   entirely. Landscape therefore covers and accepts the trim, and portrait
+ *   falls back to the whole uncropped image -- see THE HERO.
+ *
+ *   Its text is also pixels, not text. The alt attribute is the only way a
+ *   screen reader or a crawler reaches that content, so it carries all of it
+ *   verbatim rather than describing the picture.
  */
 
 /*
@@ -94,9 +100,6 @@
  * -----------------------------------------------------------------------------
  * Root font size is set in vw, so 1rem is ~1px at 1920 and every length written
  * in rem below scales with the viewport instead of stepping at breakpoints.
- * Kept from the previous build because a one-screen layout is exactly what it
- * is good for: the bar, the image and the footer all shrink together, so the
- * screen stays full without a stack of media queries.
  */
 :root {
   font-size: clamp(0.05625rem, 0.0520833333vw, 0.075rem);
@@ -113,15 +116,13 @@
   --bk: #111111;
   --gr: #6e6e6e;
 
-  /* Straight off the supplied logo, and the only two colours on the page that
-   * are not black, white or grey. */
-  --blue: #3e89c8;
-  --orange: #f99d2d;
+  /* The artwork's own blue, sampled from the field rather than picked by eye:
+   * quantising the image to eight buckets puts a fifth of it within a shade of
+   * this. It backs the letterbox on portrait screens, so the bands read as more
+   * of the picture instead of as a white frame around it. */
+  --art-blue: #4a96c9;
 
   --font-atlas: atlas;
-
-  /* Slow, no overshoot. Carried over from the previous build. */
-  --ease-ref: cubic-bezier(0.17, 0.84, 0.44, 1);
 
   color-scheme: light;
 }
@@ -144,27 +145,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/*
- * The one-screen frame. Three rows: the bar and the footer take exactly the
- * height of their content, and the image gets everything left over.
- *
- * 100dvh, not 100vh -- on mobile Safari and Chrome the retracting address bar
- * makes 100vh taller than the visible viewport, which would push the footer off
- * the bottom of the very screen this layout exists to fit.
- *
- * `height`, NOT `min-height`. A min-height leaves the grid's own height
- * indefinite, and against an indefinite height `1fr` resolves to the content's
- * max-content size rather than to the space left over -- so the row took the
- * artwork's full intrinsic height, `height: 100%` inside it fell back to auto,
- * and the footer was pushed clean off the bottom of the screen. A definite
- * height is what makes both the 1fr row and the percentage chain below it
- * resolve against the viewport.
- */
 body {
   width: 100%;
-  height: 100dvh;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
   background-color: var(--wh);
   color: var(--bk);
   font-family: var(--font-atlas), ui-sans-serif, system-ui, sans-serif;
@@ -175,41 +157,22 @@ body {
   font-synthesis-weight: none;
 }
 
-/*
- * [BLOCKED -- see the note in the markup] Phones opt out of the one-screen
- * frame entirely and scroll instead. Held to one screen, a 16:9 image sharing
- * a 667px-tall viewport with the bar, the notice and a five-line address ends
- * up about a fifth of the screen high, which makes the artwork's typeset title
- * illegible. This reverts when the portrait crop of the key visual arrives.
- */
-@media (max-width: 767.98px) {
-  body {
-    height: auto;
-    min-height: 100dvh;
-    display: block;
-  }
-}
-
 a {
   color: inherit;
   text-decoration: none;
 }
 
 ::selection {
-  background: var(--blue);
+  background: var(--art-blue);
   color: var(--wh);
 }
 
 :focus-visible {
-  outline: 2px solid var(--blue);
+  outline: 2px solid var(--art-blue);
   outline-offset: 4rem;
 }
 
-/*
- * A 30px page gutter at 1920. Everything on the page sits inside it, the
- * artwork included -- so the image never touches the screen edge on a short,
- * wide window, where `contain` would otherwise make it width-limited.
- */
+/* A 30px page gutter at 1920. The hero deliberately sits outside it. */
 .ctr {
   width: 100%;
   padding: 0 30rem;
@@ -222,100 +185,54 @@ a {
 }
 
 /* -------------------------------------------------------------------------- */
-/* THE BAR                                                                    */
+/* THE HERO                                                                   */
 /* -------------------------------------------------------------------------- */
 /*
- * Solid, in normal flow, sitting ABOVE the image rather than floating over it.
- * A floating bar was the original intent, but the artwork's own title block
- * starts about 8% down its left side, so anything overlaying the top of the
- * image lands on "Bridging Resilience(s)".
+ * One full viewport of artwork, flush to all four edges.
  *
- * The lockup keeps its brand blue and orange, which it can do here because it
- * is on white. Over the artwork -- cerulean and saffron, the same two hues --
- * it would have had to go flat white to stay legible.
+ * 100dvh, not 100vh -- on mobile Safari and Chrome 100vh is the height the
+ * viewport has with the address bar RETRACTED, so at rest the image would run
+ * under the browser chrome and the page would start already scrolled.
  */
-.bar {
-  padding: 18rem 0;
-  background-color: var(--wh);
+.hero {
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--art-blue);
 }
 
-.bar-logo {
-  display: block;
-  width: auto;
-  height: 46rem;
-}
-
-@media (max-width: 767.98px) {
-  .bar {
-    padding: 16rem 0;
-  }
-  .bar-logo {
-    height: 34rem;
-  }
-}
-
-/* -------------------------------------------------------------------------- */
-/* THE STAGE                                                                  */
-/* -------------------------------------------------------------------------- */
-/*
- * `min-height: 0` is load-bearing. A grid item's default `min-height: auto`
- * refuses to shrink below its content, so without this the 1fr row is floored
- * at the image's intrinsic height and the footer is pushed off-screen on any
- * window shorter than the artwork.
- */
-.stage {
-  min-height: 0;
-  display: block;
-}
-
-.stage picture,
-.stage-img {
+.hero picture,
+.hero-img {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-/*
- * contain, never cover. See the note at the top of the file: the title is
- * typeset into the artwork and runs nearly its full width, so cropping is not
- * an option at any viewport. The leftover space is left white.
- */
-.stage-img {
-  object-fit: contain;
+.hero-img {
+  object-fit: cover;
   object-position: center;
 }
 
-/* Scrolling, not fitted: the image takes its natural height and the page runs
- * on past it. `height: 100%` here would collapse to nothing, because the block
- * layout above gives it no definite height to resolve against. */
-@media (max-width: 767.98px) {
-  .stage picture,
-  .stage-img {
-    height: auto;
-  }
-}
-
 /*
- * Portrait viewports -- an iPad held upright, most obviously.
+ * Portrait and square viewports do NOT crop.
  *
- * A 16:9 image can never fill a taller-than-wide screen, so `contain` leaves
- * real space over. Centred in the row, that space splits either side of the
- * artwork and the page reads as a picture marooned between two voids. Letting
- * the image sit up against the bar collects all of it into one band above the
- * footer, which is just an ordinary short page.
+ * Cover takes its trim off whichever axis is over-long, and on a screen taller
+ * than it is wide that is the width -- the axis the artwork's title runs along.
+ * A phone would lose the title completely, which is most of what the image is
+ * for. So below square the whole picture is shown and the leftover height is
+ * filled with the artwork's own blue, set on .hero above.
  *
- * Keyed on aspect ratio rather than width because that is the actual condition:
- * the artwork is width-limited exactly when the viewport is narrower than it is
- * tall. 3/4 is iPad portrait; anything squarer still fills well enough to centre.
+ * Keyed on aspect ratio, not width: the condition is genuinely "is this
+ * viewport narrower than it is tall", not "is this a phone". A landscape phone
+ * covers like anything else.
+ *
+ * [BLOCKED] When the client sends the portrait crop of the key visual, add it
+ * as the first <source> in the markup below and this fallback can go -- portrait
+ * screens would then cover a portrait asset and fill the screen properly too.
  */
-@media (min-width: 768px) and (max-aspect-ratio: 3/4) {
-  .stage {
-    display: flex;
-    align-items: flex-start;
-  }
-  .stage picture,
-  .stage-img {
-    height: auto;
+@media (max-aspect-ratio: 1/1) {
+  .hero-img {
+    object-fit: contain;
   }
 }
 
@@ -323,11 +240,12 @@ a {
 /* THE FOOTER                                                                 */
 /* -------------------------------------------------------------------------- */
 /*
- * Two blocks on one row: the launch notice on the left, where it is read first,
- * and the department's address on the right. Below 768 they simply stack.
+ * The whole of the second screen, and no taller than it needs to be. The launch
+ * notice on the left, where it is read first, and the department's address on
+ * the right. Below 768 they stack.
  */
 .ftr {
-  padding: 32rem 0 28rem;
+  padding: 56rem 0 44rem;
 }
 
 .ftr-in {
@@ -367,7 +285,7 @@ a {
 
 @media (max-width: 767.98px) {
   .ftr {
-    padding: 28rem 0 32rem;
+    padding: 36rem 0 40rem;
   }
   .ftr-in {
     display: block;
@@ -407,7 +325,7 @@ a {
   background: currentColor;
   transform: scaleX(0);
   transform-origin: right center;
-  transition: transform 1.109s var(--ease-ref);
+  transition: transform 1.109s cubic-bezier(0.17, 0.84, 0.44, 1);
   pointer-events: none;
 }
 
@@ -421,39 +339,19 @@ a {
  * -----------------------------------------------------------------------------
  * ENTRANCE
  * -----------------------------------------------------------------------------
- * Everything is above the fold on a one-screen page, so there is nothing to
- * observe and nothing to defer: the whole entrance is one keyframe running on
- * load, staggered by delay. `both` holds the opening state before the delay
- * elapses, so nothing flashes in at full opacity first.
- *
- * No JavaScript is involved, which is what makes the page work with scripting
- * disabled -- the state the previous build could only reach through a script.
+ * One keyframe on load, and only on the hero. The footer is below the fold now,
+ * so animating it would mean an observer, and an observer means JavaScript --
+ * which is the one thing this page does not have. It simply arrives.
  */
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 16rem, 0);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+@keyframes fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-.rise {
-  animation: rise 0.9s var(--ease-ref) both;
+.fade {
+  animation: fade 1.1s cubic-bezier(0.17, 0.84, 0.44, 1) both;
 }
 
-.d1 { animation-delay: 0.05s; }
-.d2 { animation-delay: 0.14s; }
-.d3 { animation-delay: 0.24s; }
-
-/*
- * =============================================================================
- * REDUCED MOTION
- * =============================================================================
- * The entrance resolves instantly and the page is simply a static document.
- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -468,40 +366,26 @@ a {
 
 <body>
 
-<header class="bar">
-  <div class="ctr">
-    <a href="/" aria-label="APRU-SCL 2027, Singapore — home">
-      <img
-        class="bar-logo rise"
-        src="images/logo.svg"
-        width="111"
-        height="61"
-        alt="APRU-SCL 2027 Singapore">
-    </a>
-  </div>
-</header>
-
-<main class="stage ctr">
+<main class="hero">
   <picture>
     <!--
       [BLOCKED] A portrait crop of the key visual has been requested from the
-      client for phones. The artwork is 16:9 with its title running across
-      almost its full width, so at 375px the type is around 5px tall. When the
-      vertical version arrives, add it here as the first source:
+      client. Once it lands, add it here as the first source and drop the
+      max-aspect-ratio rule in the stylesheet:
 
-        <source media="(max-width: 767.98px)"
+        <source media="(max-aspect-ratio: 1/1)"
                 srcset="images/hero-portrait.avif" type="image/avif">
 
-      Until then phones get the full 16:9 artwork and the page scrolls rather
-      than holding to one screen -- see the media query on `body`. That is the
-      interim state, not a bug.
+      Until then portrait screens show the whole 16:9 artwork letterboxed on the
+      artwork's blue, rather than cropping its title away. That is the interim
+      state, not a bug.
     -->
     <source
       srcset="images/hero-1920.avif 1920w, images/hero-1280.avif 1280w, images/hero-768.avif 768w"
       type="image/avif"
       sizes="100vw">
     <img
-      class="stage-img rise d1"
+      class="hero-img fade"
       src="images/hero-768.webp"
       width="2320"
       height="1305"
@@ -512,14 +396,14 @@ a {
 <footer class="ftr">
   <div class="ctr">
     <div class="ftr-in">
-      <p class="ftr-note rise d2">
+      <p class="ftr-note">
         Our full website will be launching in mid-September 2026.
         Please check back soon for updates.
       </p>
 
       <!-- Address exactly as supplied by the department, postcode spacing
            included. NUS's own house style writes it unspaced as 117566. -->
-      <address class="ftr-addr rise d3">
+      <address class="ftr-addr">
         <span class="ftr-lines">Department of Architecture<br>
         National University of Singapore<br>
         College of Design and Engineering<br>
