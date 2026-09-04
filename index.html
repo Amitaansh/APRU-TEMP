@@ -12,6 +12,12 @@
 <link rel="icon" href="icon.png" sizes="180x180">
 <link rel="apple-touch-icon" href="icon.png">
 
+<!-- The hero is a full-viewport blue and, on a phone, the browser's own chrome
+     sits directly on top of it. Without this the status bar stays white and
+     there is a visible seam across the top of the artwork at rest. Same value
+     as --art-blue below, which was sampled from the plate. -->
+<meta name="theme-color" content="#4896bf">
+
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Bridging Resilience(s)">
 <meta property="og:title" content="Bridging Resilience(s) · The 10th Conference of APRU-SCL">
@@ -209,8 +215,9 @@ svg {
  * 17px margin, which is mean). The footer has to follow on exactly the same
  * condition, or the two columns step apart at the fold -- most visibly on a
  * portrait tablet, which is wider than the phone breakpoint but still uses the
- * hero's narrow layout. */
-@media (max-aspect-ratio: 1/1), (max-width: 767.98px) {
+ * hero's narrow layout. Kept identical to the hero's own condition below; if
+ * one of the two moves, so must the other. */
+@media (max-aspect-ratio: 1/1) {
   .ctr {
     padding: 0 6.5%;
   }
@@ -252,10 +259,27 @@ svg {
   --u: 1vw;
 }
 
+/*
+ * The second term is a FLOOR AGAINST SHORT SCREENS, and it is inert on every
+ * real one. Sizing the whole composition off the width means its height is a
+ * fixed share of that width -- measured, 19.06% -- so on a viewport wider than
+ * about 5:1 the artwork is taller than the screen it is in and "overflow:
+ * hidden" below would silently cut the marks off the bottom. That is the same
+ * failure the landscape phone used to hit (see NARROW AND PORTRAIT); this is
+ * the general form of it.
+ *
+ * min() takes whichever of the two is the binding constraint: 1cqw until the
+ * viewport passes 5:1, and height-derived after it, which holds the full
+ * composition on screen with about 5% to spare. At 16:9 the width term is less
+ * than half the height term, so nothing here changes what a normal screen
+ * renders -- 1920x1080 still resolves --u to exactly 19.2px.
+ *
+ * cqh is why the container is typed "size" and not "inline-size".
+ */
 @supports (container-type: size) {
   .hero {
     container-type: size;
-    --u: 1cqw;
+    --u: min(1cqw, 5cqh);
   }
 }
 
@@ -481,17 +505,31 @@ svg {
  * -----------------------------------------------------------------------------
  * NARROW AND PORTRAIT
  * -----------------------------------------------------------------------------
- * Below square -- or on any phone-width screen -- the artwork's own proportions
- * stop being useful. Line 2 is 53 characters and would have to shrink to about
- * 12px to hold two lines on a phone, so instead the type goes UP as a share of
- * the width, wraps to as many lines as it needs, and the block centres itself
- * in the screen. The marks stack and grow enough for the department line under
- * the NUS lockup to stay readable.
+ * Below square the artwork's own proportions stop being useful. Line 2 is 53
+ * characters and would have to shrink to about 12px to hold two lines on a
+ * phone, so instead the type goes UP as a share of the width, wraps to as many
+ * lines as it needs, and the block centres itself in the screen. The marks
+ * stack and grow enough for the department line under the NUS lockup to stay
+ * readable.
  *
- * Keyed on aspect ratio as well as width because the condition is genuinely "is
- * there room for a 53-character line", not "is this a phone".
+ * Keyed on ASPECT RATIO ALONE, and that is the whole of the condition. It used
+ * to carry a second arm, "or max-width: 767.98px", meant to read as "or a
+ * phone" -- but a phone held sideways is 667x325, and that arm caught it. This
+ * layout then ran on a screen with no height to run on: the type ramps UP to
+ * 4cqw + 18px, which is 45px at 667, wraps to eight lines, and the marks
+ * unstack into a column underneath it. The composition came to 499px inside a
+ * 325px hero, and "overflow: hidden" on .hero cut the difference off without a
+ * scrollbar to admit it -- the date lost "Singapore" mid-word and BOTH marks
+ * were off the bottom of the screen entirely.
+ *
+ * The question this layout answers is "is the screen taller than it is wide",
+ * not "is this a phone", and the two come apart in precisely the case where
+ * getting it wrong costs the most. A landscape phone has a desktop's
+ * proportions and takes the wide layout, which is built to scale: at 667px it
+ * is a 21px title on two lines with both marks on the foot, which is the
+ * designer's composition, small.
  */
-@media (max-aspect-ratio: 1/1), (max-width: 767.98px) {
+@media (max-aspect-ratio: 1/1) {
   .hero-in {
     padding: calc(9 * var(--u)) calc(6.5 * var(--u));
   }
@@ -654,6 +692,29 @@ svg {
 }
 
 /*
+ * On a touch screen there is no hover, so the rule above never fired: the email
+ * address arrived as dark text sitting in grey text -- the one tappable thing
+ * on the page, with nothing to say so. Here it is simply already drawn, and the
+ * animation is left to the pointers that can play it.
+ *
+ * The address is also only about 15px of line box, so roughly 20px of hit area
+ * against the 44px a fingertip wants. ::after enlarges the target without
+ * touching the layout or the rule's position -- padding would move both, since
+ * ::before is placed against the element's own box.
+ */
+@media (pointer: coarse) {
+  .link::before {
+    transform: scaleX(1);
+  }
+
+  .link::after {
+    content: "";
+    position: absolute;
+    inset: -12px -8px;
+  }
+}
+
+/*
  * -----------------------------------------------------------------------------
  * ENTRANCE
  * -----------------------------------------------------------------------------
@@ -708,12 +769,12 @@ svg {
   -->
   <picture class="hero-bg">
     <source
-      media="(max-aspect-ratio: 3/4)"
+      media="(max-aspect-ratio: 1/1)"
       srcset="images/hero-por-720.avif 720w, images/hero-por-1080.avif 1080w"
       sizes="100vw"
       type="image/avif">
     <source
-      media="(max-aspect-ratio: 3/4)"
+      media="(max-aspect-ratio: 1/1)"
       srcset="images/hero-por-720.webp"
       type="image/webp">
     <source
