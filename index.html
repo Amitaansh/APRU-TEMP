@@ -211,15 +211,16 @@ svg {
   padding: 0 4.4271%;
 }
 
-/* The hero opens its gutter up on narrow screens (4.43% of a 390px phone is a
- * 17px margin, which is mean). The footer has to follow on exactly the same
- * condition, or the two columns step apart at the fold -- most visibly on a
- * portrait tablet, which is wider than the phone breakpoint but still uses the
- * hero's narrow layout. Kept identical to the hero's own condition below; if
- * one of the two moves, so must the other. */
+/* The hero opens its gutter up on narrow screens: 7.87% is the mobile board's
+ * own 85px margin at 1080, where 4.4271% is the same 85px at 1920. The footer
+ * has to follow on exactly the same condition AND at exactly the same figure,
+ * or the two columns step apart at the fold -- most visibly on a portrait
+ * tablet, which is wide but still uses the hero's narrow layout. Both halves of
+ * that are load-bearing: if either the condition or the number moves here, it
+ * moves in .hero-in too. */
 @media (max-aspect-ratio: 1/1) {
   .ctr {
-    padding: 0 6.5%;
+    padding: 0 7.87%;
   }
 }
 
@@ -372,7 +373,10 @@ svg {
   letter-spacing: 0.0219em;
 }
 
-.kv-title span {
+/* A CHILD selector, not a descendant one: .kv-brk sits inside line 2 to force
+ * the narrow layout's line break, and a descendant selector would block it and
+ * nowrap it here too -- splitting line 2 in the wide layout as well. */
+.kv-title > span {
   display: block;
   white-space: nowrap;
 }
@@ -530,65 +534,117 @@ svg {
  * designer's composition, small.
  */
 @media (max-aspect-ratio: 1/1) {
+  /*
+   * ---------------------------------------------------------------------------
+   * WHAT THE MOBILE ARTBOARD TURNED OUT TO BE
+   * ---------------------------------------------------------------------------
+   * The designer supplied this layout as a 1080x1350 board, and measured off it
+   * nothing in it is new. It is the SAME composition as the 1920 artwork, at
+   * the same physical size, re-flowed into a narrower canvas. Every figure on
+   * the board lands on one the wide layout already carries:
+   *
+   *     margins    85px      the artwork's  85px
+   *     title      61px      the artwork's  61px
+   *     date       55px      the artwork's  55px
+   *     APRU      272px      the artwork's 273px
+   *     gap        72px      the artwork's  72px
+   *     NUS       567px      the artwork's 570px
+   *
+   * So this block does not invent a mobile scale. It states the artwork's own
+   * proportions against a narrower measure: the marks fill the whole column
+   * instead of half of it, and the title, held at its size, falls onto three
+   * lines instead of two.
+   *
+   * The pass before this one had guessed at all of it -- the type was ramped UP
+   * to 4cqw + 18px, which is about 2.4x the artwork's, the title wrapped to six
+   * lines, the marks stacked, and the block was centred in the screen. It read
+   * as a phone layout. The board is a poster.
+   */
+
+  /* 85px at 1080, which is the same 85px the wide layout writes as 4.4271%. */
   .hero-in {
-    padding: calc(9 * var(--u)) calc(6.5 * var(--u));
+    padding: calc(7.87 * var(--u));
   }
 
   /*
-   * The one place a fixed length is mixed into the scale, and deliberately.
-   * A pure percentage that reads well on a 390px phone is overbearing by the
-   * time the same layout reaches a 768px tablet -- 8.5% is 33px on one and 65px
-   * on the other. Adding a constant makes the ramp sublinear: 34px at 390,
-   * 49px at 768, and still 31px on a 320px screen.
+   * .kv stops generating a box, which promotes the title and the date to
+   * siblings of the marks. .hero-in's space-between then has THREE items to
+   * distribute rather than two, and the date comes to rest around the middle of
+   * the screen, which is where the board puts it. A phone is far taller than
+   * the board's 4:5, and that only opens the two gaps further -- what the board
+   * fixes is the order and the two anchors, not the amount of air between them.
+   *
+   * Custom properties inherit through display: contents, so --fs-t still
+   * reaches both children. Margins do not, so the side bearing is re-applied to
+   * each of them below, and the entrance fade moved onto them in the markup:
+   * an element with no box has nothing to fade.
    */
   .kv {
-    --fs-t: calc(4cqw + 18px);
+    display: contents;
 
-    /* Grow into all the room above the marks and centre inside it. Three
-     * competing auto margins would only put the block a third of the way
-     * down. */
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    /*
+     * 61px at 1080, and pinned by an ink width rather than chosen -- the same
+     * way the wide layout's size is pinned. The longest of the three lines,
+     * "and Landscapes Conference", measures 14.6975em of Atlas Bold at this
+     * tracking, and 5.647 x 14.6975 = 83.0 against a column of 84.26. That is
+     * 98.5% of the measure, the same "it fits everywhere or nowhere" bet the
+     * wide layout makes at 99.4%, with a point and a half more slack: an
+     * overshoot there re-breaks a line, but an overshoot HERE drops
+     * "Conference" onto a fourth line and the three-line block the whole board
+     * is built on becomes four.
+     */
+    --fs-t: calc(5.647 * var(--u));
   }
 
-  .kv-title {
-    line-height: 1.16;
+  /* Both of them, because .kv no longer has a box to carry it for the pair. */
+  .kv-title,
+  .kv-date {
+    margin-left: calc(-0.0656 * var(--fs-t));
   }
 
-  /* Wrapping is what this layout is for -- see .kv-title above for why it is
-   * switched off in the wide one. */
-  .kv-title span {
+  /*
+   * The board's line breaks are not where this text would break on its own, so
+   * they are set rather than hoped for -- by the same device the footer's
+   * address already uses, an inline promoted to a block so the line ends before
+   * it. One class does both the title's break after "Cities" and the date's
+   * before "Singapore"; in the wide layout .kv-brk stays inline and neither
+   * break exists.
+   */
+  .kv-brk {
+    display: block;
+  }
+
+  /* Wrapping stays available underneath the set breaks, so that if the type
+   * ever does overshoot it lands as a fourth line rather than as ink out past
+   * the gutter. */
+  .kv-title > span {
     white-space: normal;
     text-wrap: pretty;
   }
 
-  /* No font-size here: the base rule already ties the date to --fs-t at the
-   * artwork's 55/61 ratio, and --fs-t is re-ramped above. Overriding it again
-   * pushed the date past the gutter and broke "Singapore" onto its own line on
-   * screens that had room for it. */
+  /* The date is its own flex item now and space-between places it. The gap it
+   * used to hold under the title would only push it off centre. */
   .kv-date {
-    margin-top: calc(3 * var(--u));
+    margin-top: 0;
   }
 
-  /* Stacked, and left where the flex line ends -- the foot of the screen. */
+  /*
+   * Side by side as on the board, and filling the column: at 1080 this comes to
+   * 272 / 72 / 567 against the artwork's 273 / 72 / 570. The three percentages
+   * are the artwork's own widths renormalised onto the row -- 273 : 72 : 570 of
+   * 915 -- so the lockup keeps its internal proportions exactly and the row
+   * still ends on the right gutter at every width.
+   */
   .kv-marks {
-    display: block;
-
-    /* Same sublinear ramp as the type, so the department line under the NUS
-     * lockup stays readable on a phone without the pair taking over a tablet.
-     * The 2.088 is the two marks' width ratio in the artwork, kept exactly. */
-    --mark: calc(21cqw + 57.5px);
+    gap: 7.869%;
   }
 
   .mark-apru {
-    width: var(--mark);
+    width: 29.836%;
   }
 
   .mark-nus {
-    width: calc(2.088 * var(--mark));
-    margin-top: calc(5 * var(--u));
+    width: 62.295%;
   }
 }
 
@@ -791,12 +847,22 @@ svg {
   </picture>
 
   <div class="hero-in">
-    <div class="kv fade">
-      <h1 class="kv-title">
+    <!--
+      .kv is a grouping box in the wide layout and nothing at all in the narrow
+      one, where it is display: contents so that these two become siblings of
+      the marks. The fade therefore sits on the children rather than on .kv,
+      which in that layout has no box to fade.
+
+      The two .kv-brk spans are the narrow layout's line breaks, set rather than
+      left to wrap -- see NARROW AND PORTRAIT. They are inert inline spans in
+      the wide layout, where both of the title's lines run full width.
+    -->
+    <div class="kv">
+      <h1 class="kv-title fade">
         <span>Bridging Resilience(s):</span>
-        <span>The 10<sup>th</sup> Sustainable Cities and Landscapes Conference</span>
+        <span>The 10<sup>th</sup> Sustainable Cities <span class="kv-brk">and Landscapes Conference</span></span>
       </h1>
-      <p class="kv-date">21—23 May 2027, Singapore</p>
+      <p class="kv-date fade">21—23 May 2027, <span class="kv-brk">Singapore</span></p>
     </div>
 
     <div class="kv-marks fade fade-2">
