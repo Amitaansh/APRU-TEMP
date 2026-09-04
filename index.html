@@ -7,7 +7,11 @@
 <title>Bridging Resilience(s) · The 10th Conference of APRU-SCL</title>
 <meta name="description" content="Bridging Resilience(s) — The 10th Conference of APRU-SCL, 21–23 May 2027, Singapore. Hosted by the NUS Department of Architecture, College of Design and Engineering.">
 <link rel="canonical" href="https://apruscl2027.com/">
-<link rel="icon" href="icon.png">
+
+<!-- SVG first for anything modern; the PNG is the fallback and doubles as the
+     iOS home-screen icon. Both are the APRU-SCL 2027 Singapore lockup. -->
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon.png" sizes="180x180">
 <link rel="apple-touch-icon" href="icon.png">
 
 <meta property="og:type" content="website">
@@ -16,6 +20,9 @@
 <meta property="og:description" content="Bridging Resilience(s) — The 10th Conference of APRU-SCL, 21–23 May 2027, Singapore. Hosted by the NUS Department of Architecture, College of Design and Engineering.">
 <meta property="og:url" content="https://apruscl2027.com/">
 <meta property="og:locale" content="en_SG">
+<!-- [OPEN] og.png still carries the superseded artwork. Regenerating it from
+     the 3 Sept key visual is a five-minute job in the same pipeline that built
+     images/hero-*.avif; it was deliberately left out of this pass. -->
 <meta property="og:image" content="https://apruscl2027.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -25,63 +32,71 @@
 <meta name="twitter:description" content="Bridging Resilience(s) — The 10th Conference of APRU-SCL, 21–23 May 2027, Singapore. Hosted by the NUS Department of Architecture, College of Design and Engineering.">
 <meta name="twitter:image" content="https://apruscl2027.com/og.png">
 
-<link rel="preload" href="fonts/Switzer-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/HedvigLettersSerif-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/AtlasGrotesk-Regular.woff2" as="font" type="font/woff2" crossorigin>
 
 <style>
 /*
  * =============================================================================
  * A HOLDING PAGE FOR apruscl2027.com
  * =============================================================================
- * One file, no build step. The design system below is copied from the real
- * site's codebase/app/globals.css, which cannot be included directly: it opens
- * with `@import "tailwindcss"` and configures its theme through an `@theme`
- * block that only the PostCSS build understands. Everything here carrying a
- * class name from that file is a verbatim copy of it, so the two cannot drift;
- * the classes further down stand in for the Tailwind utilities the React
- * components used, with the same declarations.
+ * One file, no build step, and no JavaScript at all.
  *
- * The halo -- the WebGL torus that arcs behind the wordmark on the real site --
- * is deliberately absent. See THE WORDMARK below.
+ * The whole page is one screen: a bar carrying the event lockup, the key
+ * visual, and the contact block. There is nothing below the fold to reveal on
+ * scroll, so the entrance is a plain CSS animation that runs on load -- which
+ * is also why the page is fully readable with scripting off. The previous
+ * build drove its reveals from an IntersectionObserver and rendered blank
+ * without JS; that whole apparatus is gone.
+ *
+ * THE ARTWORK IS THE CONTENT. The conference title, the dates and the APRU and
+ * NUS marks are all typeset INTO the supplied image. Two consequences run
+ * through everything below:
+ *   1. It can never be cropped -- hence `object-fit: contain` everywhere, and
+ *      no full-bleed `cover`. The title runs to ~95% of the image width, so any
+ *      crop at all eats into it.
+ *   2. Its text is pixels, not text. The alt attribute is the only way a screen
+ *      reader or a search engine gets that content, so it carries all of it
+ *      verbatim rather than describing the picture.
  */
 
 /*
  * -----------------------------------------------------------------------------
  * FACES
  * -----------------------------------------------------------------------------
- * next/font's job, done by hand. Switzer is a variable face carrying the whole
- * 100-900 range in one file; Hedvig is used at 400 and nowhere else, so the
- * static Regular is the whole requirement.
+ * Atlas Grotesk -- the face the artwork itself is set in, so the page type and
+ * the image type are one voice. Subset from the supplied desktop OTFs to the
+ * ~120 characters this page can use, which is what takes each file from 649
+ * glyphs to under 9 KB.
+ *
+ * [OPEN] These were supplied as DESKTOP licences. fsType permits embedding, but
+ * Commercial Type sells webfont licences separately -- to be confirmed with the
+ * client before the domain is pointed here.
  */
 @font-face {
-  font-family: switzer;
-  src: url("fonts/Switzer-Variable.woff2") format("woff2");
-  font-weight: 100 900;
+  font-family: atlas;
+  src: url("fonts/AtlasGrotesk-Regular.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Hedvig Letters Serif";
-  src: url("fonts/HedvigLettersSerif-Regular.woff2") format("woff2");
-  font-weight: 400;
+  font-family: atlas;
+  src: url("fonts/AtlasGrotesk-Bold.woff2") format("woff2");
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 /*
  * -----------------------------------------------------------------------------
- * FLUID ROOT
+ * THE rem TRICK
  * -----------------------------------------------------------------------------
- * The whole site is drawn at a fixed design basis and scaled by viewport width:
- * 1rem === 1px at 1920 wide on desktop, and 1px at 375 wide on mobile. Every
- * number in this file is therefore "px at design width", which is why nothing
- * ever reflows between breakpoints -- it only scales.
- *
- * The clamp bounds are expressed in rem, not px, on purpose. On the root element
- * `rem` resolves against the *initial* font-size, i.e. the reader's own browser
- * default. So a visitor who has raised their base size still gets proportionally
- * larger type everywhere, which a bare vw value would throw away.
+ * Root font size is set in vw, so 1rem is ~1px at 1920 and every length written
+ * in rem below scales with the viewport instead of stepping at breakpoints.
+ * Kept from the previous build because a one-screen layout is exactly what it
+ * is good for: the bar, the image and the footer all shrink together, so the
+ * screen stays full without a stack of media queries.
  */
 :root {
   font-size: clamp(0.05625rem, 0.0520833333vw, 0.075rem);
@@ -93,44 +108,19 @@
   }
 }
 
-/*
- * -----------------------------------------------------------------------------
- * PALETTE
- * -----------------------------------------------------------------------------
- * Five neutrals and one accent. --ac has exactly one job -- live state, i.e. a
- * deadline that is open or the date that is next -- and is never used for
- * headings, links, borders, hovers or decoration. #c2410c clears 5.9:1 on white,
- * so it is safe as text; the brand #f89c2c is not (1.9:1) and survives only
- * inside the hero artwork.
- */
 :root {
   --wh: #ffffff;
-  --bk: #000000;
-  --gr: #eeeeee;
-  --gr2: #e2e2e2;
-  --gr3: #6e6e6e;
+  --bk: #111111;
+  --gr: #6e6e6e;
 
-  /* Secondary text on the dark ground. #929292 is the reference's grey and
-   * clears 6.7:1 on black, but only 3.1:1 on white -- hence the pair. */
-  --gr3-dark: #929292;
-  --ac: #c2410c;
+  /* Straight off the supplied logo, and the only two colours on the page that
+   * are not black, white or grey. */
+  --blue: #3e89c8;
+  --orange: #f99d2d;
 
-  /* The brand orange. Never used as text on white (1.9:1) -- only on the dark
-   * ground, where it clears 8.9:1, and inside the artwork. */
-  --orange: #f89c2c;
+  --font-atlas: atlas;
 
-  /* Descender headroom for masked lines, sized from the real font metrics.
-   * Hedvig's ink spans 1.214em, Switzer's 1.185em, so at the tightest leading on
-   * the site (0.82) the headroom needed per side is 0.197em. */
-  --off: 0.22em;
-
-  /* Height of the fixed header: 24 of pad, three 19rem lines, 24 of pad. */
-  --hdr: 105rem;
-
-  --font-switzer: switzer;
-  --font-hedvig: "Hedvig Letters Serif";
-
-  /* Every transition on the site uses this curve. Slow, no overshoot. */
+  /* Slow, no overshoot. Carried over from the previous build. */
   --ease-ref: cubic-bezier(0.17, 0.84, 0.44, 1);
 
   color-scheme: light;
@@ -154,33 +144,50 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/*
+ * The one-screen frame. Three rows: the bar and the footer take exactly the
+ * height of their content, and the image gets everything left over.
+ *
+ * 100dvh, not 100vh -- on mobile Safari and Chrome the retracting address bar
+ * makes 100vh taller than the visible viewport, which would push the footer off
+ * the bottom of the very screen this layout exists to fit.
+ *
+ * `height`, NOT `min-height`. A min-height leaves the grid's own height
+ * indefinite, and against an indefinite height `1fr` resolves to the content's
+ * max-content size rather than to the space left over -- so the row took the
+ * artwork's full intrinsic height, `height: 100%` inside it fell back to auto,
+ * and the footer was pushed clean off the bottom of the screen. A definite
+ * height is what makes both the 1fr row and the percentage chain below it
+ * resolve against the viewport.
+ */
 body {
   width: 100%;
-  min-height: 100%;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   background-color: var(--wh);
   color: var(--bk);
-  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-atlas), ui-sans-serif, system-ui, sans-serif;
   font-size: 18rem;
   font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
   font-synthesis-weight: none;
 }
 
+/*
+ * [BLOCKED -- see the note in the markup] Phones opt out of the one-screen
+ * frame entirely and scroll instead. Held to one screen, a 16:9 image sharing
+ * a 667px-tall viewport with the bar, the notice and a five-line address ends
+ * up about a fifth of the screen high, which makes the artwork's typeset title
+ * illegible. This reverts when the portrait crop of the key visual arrives.
+ */
 @media (max-width: 767.98px) {
   body {
-    font-size: 15rem;
+    height: auto;
+    min-height: 100dvh;
+    display: block;
   }
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-weight: 400;
 }
 
 a {
@@ -188,381 +195,190 @@ a {
   text-decoration: none;
 }
 
-img {
-  max-width: 100%;
-  object-fit: cover;
-}
-
 ::selection {
-  background: var(--ac);
+  background: var(--blue);
   color: var(--wh);
 }
 
 :focus-visible {
-  outline: 1px solid currentColor;
+  outline: 2px solid var(--blue);
   outline-offset: 4rem;
 }
 
 /*
- * -----------------------------------------------------------------------------
- * TYPE SCALE
- * -----------------------------------------------------------------------------
- * Serif display, sans text. Leading tightens as size grows -- at display sizes
- * the lines are meant to stack almost touching.
- */
-.t-h1 {
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 175rem;
-  letter-spacing: -0.03em;
-  line-height: 0.85;
-}
-
-.t-h2 {
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 118rem;
-  letter-spacing: -0.03em;
-  line-height: 0.9;
-}
-
-.t-h3 {
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 80rem;
-  letter-spacing: -0.03em;
-  line-height: 0.92;
-}
-
-.t-h4 {
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 40rem;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-
-.t-b1 {
-  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
-  font-size: 18rem;
-  letter-spacing: -0.02em;
-  line-height: 1.35;
-}
-
-.t-b2 {
-  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
-  font-size: 15rem;
-  letter-spacing: -0.02em;
-  line-height: 1.35;
-}
-
-/* Small serif label. The signature move of the reference: a tiny serif word
- * sitting beside sans data, in place of an uppercase mono micro-caption. */
-.t-lbl {
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 16rem;
-  letter-spacing: 0;
-  line-height: 1.2;
-}
-
-@media (max-width: 767.98px) {
-  .t-h1 {
-    font-size: 40rem;
-    line-height: 0.95;
-  }
-  .t-h2 {
-    font-size: 34rem;
-  }
-  .t-h3 {
-    font-size: 28rem;
-  }
-  .t-h4 {
-    font-size: 22rem;
-  }
-  .t-b1 {
-    font-size: 15rem;
-  }
-  .t-b2 {
-    font-size: 13rem;
-  }
-  .t-lbl {
-    font-size: 14rem;
-  }
-}
-
-.f-serif {
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-}
-
-.dim {
-  color: var(--gr3);
-}
-
-/* Live state -- the accent's only assignment. */
-.live {
-  color: var(--ac);
-}
-
-/* Digits that sit in columns have to line up. */
-.tnum {
-  font-variant-numeric: tabular-nums;
-}
-
-/*
- * -----------------------------------------------------------------------------
- * LAYOUT
- * -----------------------------------------------------------------------------
- * A 30px page gutter at 1920 -- content sits close to the edge, and text is kept
- * readable by living inside a few of the fifteen columns rather than by centring
- * a narrow container.
+ * A 30px page gutter at 1920. Everything on the page sits inside it, the
+ * artwork included -- so the image never touches the screen edge on a short,
+ * wide window, where `contain` would otherwise make it width-limited.
  */
 .ctr {
-  display: block;
   width: 100%;
   padding: 0 30rem;
 }
 
-.grd {
+@media (max-width: 767.98px) {
+  .ctr {
+    padding: 0 20rem;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* THE BAR                                                                    */
+/* -------------------------------------------------------------------------- */
+/*
+ * Solid, in normal flow, sitting ABOVE the image rather than floating over it.
+ * A floating bar was the original intent, but the artwork's own title block
+ * starts about 8% down its left side, so anything overlaying the top of the
+ * image lands on "Bridging Resilience(s)".
+ *
+ * The lockup keeps its brand blue and orange, which it can do here because it
+ * is on white. Over the artwork -- cerulean and saffron, the same two hues --
+ * it would have had to go flat white to stay legible.
+ */
+.bar {
+  padding: 18rem 0;
+  background-color: var(--wh);
+}
+
+.bar-logo {
+  display: block;
+  width: auto;
+  height: 46rem;
+}
+
+@media (max-width: 767.98px) {
+  .bar {
+    padding: 16rem 0;
+  }
+  .bar-logo {
+    height: 34rem;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* THE STAGE                                                                  */
+/* -------------------------------------------------------------------------- */
+/*
+ * `min-height: 0` is load-bearing. A grid item's default `min-height: auto`
+ * refuses to shrink below its content, so without this the 1fr row is floored
+ * at the image's intrinsic height and the footer is pushed off-screen on any
+ * window shorter than the artwork.
+ */
+.stage {
+  min-height: 0;
+  display: block;
+}
+
+.stage picture,
+.stage-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * contain, never cover. See the note at the top of the file: the title is
+ * typeset into the artwork and runs nearly its full width, so cropping is not
+ * an option at any viewport. The leftover space is left white.
+ */
+.stage-img {
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Scrolling, not fitted: the image takes its natural height and the page runs
+ * on past it. `height: 100%` here would collapse to nothing, because the block
+ * layout above gives it no definite height to resolve against. */
+@media (max-width: 767.98px) {
+  .stage picture,
+  .stage-img {
+    height: auto;
+  }
+}
+
+/*
+ * Portrait viewports -- an iPad held upright, most obviously.
+ *
+ * A 16:9 image can never fill a taller-than-wide screen, so `contain` leaves
+ * real space over. Centred in the row, that space splits either side of the
+ * artwork and the page reads as a picture marooned between two voids. Letting
+ * the image sit up against the bar collects all of it into one band above the
+ * footer, which is just an ordinary short page.
+ *
+ * Keyed on aspect ratio rather than width because that is the actual condition:
+ * the artwork is width-limited exactly when the viewport is narrower than it is
+ * tall. 3/4 is iPad portrait; anything squarer still fills well enough to centre.
+ */
+@media (min-width: 768px) and (max-aspect-ratio: 3/4) {
+  .stage {
+    display: flex;
+    align-items: flex-start;
+  }
+  .stage picture,
+  .stage-img {
+    height: auto;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* THE FOOTER                                                                 */
+/* -------------------------------------------------------------------------- */
+/*
+ * Two blocks on one row: the launch notice on the left, where it is read first,
+ * and the department's address on the right. Below 768 they simply stack.
+ */
+.ftr {
+  padding: 32rem 0 28rem;
+}
+
+.ftr-in {
   display: grid;
   grid-template-columns: repeat(15, 1fr);
   gap: 20rem;
-  width: 100%;
+  align-items: start;
+}
+
+.ftr-note {
+  grid-column: 1 / span 6;
+  font-size: 20rem;
+  line-height: 1.4;
+  max-width: 46ch;
+}
+
+.ftr-addr {
+  grid-column: 10 / span 6;
+  font-style: normal;
+  font-size: 15rem;
+  line-height: 1.6;
+  color: var(--gr);
+}
+
+/* The address lines are one block so that the email below them starts on a new
+ * line. Without this the anchor is just another inline on the end of the last
+ * line, and the whitespace before it in the markup collapses to a single space
+ * -- which read as "Singapore 117 566 apru-scl2027@nus.edu.sg". */
+.ftr-lines {
+  display: block;
+}
+
+.ftr-mail {
+  margin-top: 16rem;
+  color: var(--bk);
 }
 
 @media (max-width: 767.98px) {
-  .ctr {
-    padding: 0 15rem;
+  .ftr {
+    padding: 28rem 0 32rem;
   }
-  .grd {
+  .ftr-in {
     display: block;
   }
-}
-
-/*
- * The lanes. On the real site these columns are the complement of whichever side
- * the halo has taken, so the ring and the type can never collide. The ring is
- * not here, but the asymmetry it produced IS the page's proportion, so the
- * geometry is kept exactly (see COLUMNS in components/ui/Section.tsx):
- *
- *   right  ->  halo in cols 11-15, label in 1-2, body in 3-10
- *
- * Only the right lane survives here: the page is short enough that alternating
- * sides would read as restlessness rather than as rhythm.
- */
-.lane-right-label {
-  grid-column: 1 / span 2;
-
-  /* Both rows. A sticky item can only travel inside its own grid area, so a
-   * spine that occupied row 1 alone would have nothing to hold against while
-   * row 2 scrolled past it. */
-  grid-row: 1 / span 2;
-}
-.lane-right-body {
-  grid-column: 3 / span 8;
-  grid-row: 2;
-}
-
-/* The theme's title, running to the right gutter and set flush right, so the
- * heading arrives at the far edge of the screen and the paragraph begins at the
- * near one. It starts at column 3 rather than column 1 so its left edge is the
- * body's.
- *
- * The rows are named rather than left to auto-placement: placement is sparse by
- * default and never moves the cursor backwards, so naming them is what keeps
- * the label's two-row span from pushing anything sideways. */
-.lane-title {
-  grid-column: 3 / span 13;
-  grid-row: 1;
-
-  /* On top of the grid's own 20rem row gap, for the 40 a heading wants between
-   * itself and the text it introduces. Nothing is under it once the paragraph
-   * moves up alongside; see the 1280 block. */
-  margin-bottom: 20rem;
-
-  /* So the title can be sized against THIS cell rather than the window. It has
-   * to hold "Resilience(s)" on one line at every width, because a wrap inside
-   * .ln-mask breaks the clip -- see MASKED REVEAL -- and the cell is not a fixed
-   * fraction of the viewport: the gutter and the fourteen gaps are rem, and rem
-   * stops tracking the window at its clamp floor around 1728. */
-  container-type: inline-size;
-}
-
-/*
- * Above 1280 the paragraph comes up beside the title instead of sitting under
- * it. Written as the addition rather than the base, so the narrow layout is the
- * one that needs no query.
- *
- * 1280 is a floor, not a round number. Under it the title's cell cannot hold
- * "Resilience(s)" at a size that still reads as the heading -- by 940 the cap
- * below sets it at 68rem against a label beside it set at 72.
- */
-@media (min-width: 1280px) {
-  .lane-right-label {
-    grid-row: 1;
+  .ftr-note {
+    font-size: 17rem;
+    max-width: none;
   }
-
-  .lane-title {
-    grid-column: 9 / span 7;
-    margin-bottom: 0;
-  }
-
-  /* align-self is what centres the paragraph against the title's height. It only
-   * bites on a grid item, which is why it lives in here rather than on the base
-   * rule: stacked, there is nothing to centre in. Once the theme's three
-   * paragraphs are the taller of the two, this stops moving anything -- it is
-   * the title that then sits against them, from the top. */
-  .lane-right-body {
-    grid-column: 3 / span 6;
-    grid-row: 1;
-    align-self: center;
-  }
-}
-
-/* The closing statement, one column in from the page gutter. Not the body lane:
- * "in Singapore." is 969rem and cols 3-10 are 982rem, which is close enough that
- * a wrap inside .ln-mask is one font tweak away -- and MASKED REVEAL forbids it.
- * Column 2 leaves 1735rem, which the statement and the clock both clear.
- *
- * This is a THIRD left edge, deliberately: 30 for the page's own furniture
- * (header, hero, labels, footer, wordmark), 281 for body text, and this. */
-.lane-close {
-  grid-column: 2 / span 14;
-
-  /* So the clock can be sized against THIS box rather than against the viewport;
-   * see .cd-line. The lane is not a fixed fraction of the window -- the gutter
-   * and the fourteen gaps are all rem, and rem sits on its clamp floor below
-   * about 1728, so the lane runs from 0.866 of the viewport at 768 to 0.904 at
-   * 1920. One vw number cannot serve both ends; one cqw number is exact. */
-  container-type: inline-size;
-}
-
-/*
- * -----------------------------------------------------------------------------
- * SECTION RHYTHM
- * -----------------------------------------------------------------------------
- * 100 a side, not the site's 180. This page is three screens by intent, and the
- * seams at 180 spend most of a fourth on nothing. 100 is the floor for a section
- * that fills a screen -- under it those stop reading as separate surfaces and
- * the page becomes one column.
- */
-.pad {
-  padding-top: 100rem;
-  padding-bottom: 100rem;
-}
-
-@media (max-width: 767.98px) {
-  .pad {
-    padding-top: 60rem;
-    padding-bottom: 60rem;
-  }
-}
-
-/*
- * -----------------------------------------------------------------------------
- * VERTICAL SECTION LABEL
- * -----------------------------------------------------------------------------
- * Reads top-to-bottom down the left column, which is what vertical-rl gives on
- * its own -- Latin glyphs laid on their side, turned a quarter clockwise.
- *
- * NO 180 TURN. Adding one flips the axis to bottom-to-top, which was the shape
- * this had while the title beside it was turned too. The title lies down now and
- * this is the screen's only vertical element, so the axis is its own choice --
- * top-to-bottom, because that is the direction the page is read in.
- *
- * 50rem, not the 80 it carried while it was the section's tallest element. Set
- * vertically its HEIGHT is the length of its text, so at 80 it stood 375rem tall
- * against a 238rem title and set the height of a screen it is a caption on.
- */
-.sec-label {
-  writing-mode: vertical-rl;
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 50rem;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-@media (max-width: 767.98px) {
-  .sec-label {
-    writing-mode: horizontal-tb;
-    font-size: 22rem;
-  }
-  .sec-head {
-    margin-bottom: 24rem;
-  }
-}
-
-/*
- * The spine holds below the header while its section's body scrolls past it,
- * then leaves with the section. A grid item stretches to its row by default and
- * a stretched box has nothing to stick within, so `align-self: start` is not a
- * nicety here -- without it the rule does nothing at all.
- *
- * Desktop only, and not because of the header: under 768px .grd is a block stack
- * and .sec-label is already lying flat above the body, where sticking it would
- * pin a heading over the type it introduces.
- */
-@media (min-width: 768px) {
-  .sec-spine {
-    position: sticky;
-    top: calc(var(--hdr) + 40rem);
-    align-self: start;
-  }
-}
-
-/*
- * -----------------------------------------------------------------------------
- * THE THEME'S TITLE
- * -----------------------------------------------------------------------------
- * Two lines, flush right against the page gutter, with the paragraph beside them
- * above 1280 and under them below it.
- *
- * It was set vertically for a while, and that is what cost this screen its
- * height: a vertical line is as tall as its word is long, so "Resilience(s)"
- * alone made the section 607rem before any padding was added. Lying down, the
- * same two lines are 238rem, and the height stops depending on how long the
- * words happen to be. "The theme" beside it stays vertical -- one turned element
- * on a screen reads as a device, two read as a system this page does not
- * otherwise have.
- *
- * THE MASKS CARRY THE LEADING, NOT line-height. t-h2 is set at 0.9, which is
- * 106rem of advance against 126rem of ink -- "Bridging" drops 31 below its
- * baseline and "Resilience(s)" reaches 95 above its own, so at 0.9 the two lines
- * overlap by about 20rem and the parenthesis fouls the line above. Under .e-lh
- * each .ln-mask is padded by --off and pulled back by an equal negative margin,
- * and ADJACENT MASKS COLLAPSE those negative margins rather than summing them:
- * the pair nets out at +0.22em, so the advance is 132rem and the ink clears by
- * six. Take the masks off these lines and the overlap comes back.
- *
- * The cap is measured in cqw against .lane-title, not in vw, because the cell is
- * not a fixed fraction of the window. "Resilience(s)" is 5.53em wide; 17cqw
- * holds it on one line from 768 up, and stays out of the way at 1920, where
- * 118rem is the smaller of the two.
- */
-.ttl {
-  text-align: right;
-}
-
-/* From 768 up only. Under it .t-h2 has its own step (34rem) and the second line
- * carries a 0.9em indent, and this rule -- later in the sheet and the same
- * weight -- would win over both, set the title at 17cqw and push the indented
- * line straight through the side of its own mask, which clips horizontally as
- * well as vertically. */
-@media (min-width: 768px) {
-  .ttl {
-    font-size: min(118rem, 17cqw);
-  }
-}
-
-
-/* Under 768px .grd is a block stack, the heading is the widest thing on the
- * screen, and flush right would hang it off the edge the eye reads from. Back to
- * the left, with the second line indented -- the shape it has always had here. */
-@media (max-width: 767.98px) {
-  .ttl {
-    text-align: left;
-  }
-  .ttl > span:last-child {
-    padding-left: 0.9em;
-  }
-  .lane-title {
-    margin-bottom: 28rem;
+  .ftr-addr {
+    padding-top: 28rem;
+    font-size: 14rem;
   }
 }
 
@@ -570,9 +386,9 @@ img {
  * -----------------------------------------------------------------------------
  * LINK
  * -----------------------------------------------------------------------------
- * A 1px rule that wipes in from the left over 1.109s and, on leave, retracts to
- * the right. The absurd duration is the point -- it reads as deliberate rather
- * than as a hover state.
+ * A 1px rule that wipes in from the left and, on leave, retracts to the right.
+ * The absurd duration is the point -- it reads as deliberate rather than as a
+ * hover state. Carried over unchanged from the previous build.
  */
 .link {
   position: relative;
@@ -603,1044 +419,118 @@ img {
 
 /*
  * -----------------------------------------------------------------------------
- * MASKED REVEAL
+ * ENTRANCE
  * -----------------------------------------------------------------------------
- * A single line of type rises out of a clipped wrapper.
+ * Everything is above the fold on a one-screen page, so there is nothing to
+ * observe and nothing to defer: the whole entrance is one keyframe running on
+ * load, staggered by delay. `both` holds the opening state before the delay
+ * elapses, so nothing flashes in at full opacity first.
  *
- * `overflow: hidden` clips to the MASK's padding box, so the descender room has
- * to be bought there -- padding on the inner line cannot buy it. The mask is
- * inflated by --off top and bottom and pulled back by an equal negative margin,
- * which is net-zero: the mask's outer box stays exactly one line-height tall and
- * layout is untouched, while its clip window is line-height + 2x--off.
- *
- * MASKS ARE FOR SINGLE-LINE ELEMENTS ONLY. Anything that wraps gets .rise -- a
- * wrapping inline-block inside a mask breaks the arithmetic above, because the
- * element is then taller than one line and the clip no longer corresponds to it.
+ * No JavaScript is involved, which is what makes the page work with scripting
+ * disabled -- the state the previous build could only reach through a script.
  */
-.ln-mask {
-  display: block;
-  overflow: hidden;
-}
-
-.ln-mask > .ln {
-  display: block;
-  will-change: transform;
-}
-
-.ln-mask > .wd {
-  display: inline-block;
-  will-change: transform;
-}
-
-.e-lh .ln-mask {
-  padding-top: var(--off);
-  padding-bottom: var(--off);
-  margin-top: calc(var(--off) * -1);
-  margin-bottom: calc(var(--off) * -1);
-}
-
-/*
- * A [data-reveal] element gets .is-in once, which releases every mask and rise
- * inside it. Stagger is done with transition-delay at the call site rather than
- * with per-child selectors, so a section can order its own children.
- */
-.ln-mask > .ln,
-.ln-mask > .wd {
-  transform: translate3d(0, calc(100% + var(--off)), 0);
-  transition: transform 1.15s var(--ease-ref);
-}
-
-.is-in .ln-mask > .ln,
-.is-in .ln-mask > .wd,
-.is-in.ln-mask > .ln,
-.is-in.ln-mask > .wd {
-  transform: translate3d(0, 0, 0);
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .rise {
-  opacity: 0;
-  transform: translate3d(0, 24rem, 0);
-  transition:
-    opacity 1s var(--ease-ref),
-    transform 1s var(--ease-ref);
+  animation: rise 0.9s var(--ease-ref) both;
 }
 
-.is-in .rise,
-.is-in.rise {
-  opacity: 1;
-  transform: none;
-}
-
-/*
- * -----------------------------------------------------------------------------
- * BUTTON
- * -----------------------------------------------------------------------------
- * A rectangle and a rule. No radius, no shadow, no icon.
- *
- * The fill is a pair of tokens rather than two literals because the button has
- * to be able to sit on the dark half of the site: a hard-coded black fill is
- * invisible on the footer, which is where the primary CTA lives.
- */
-.btn {
-  --btn-fill: var(--bk);
-  --btn-ink: var(--wh);
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12rem;
-  padding: 14rem 34rem;
-  border: 1px solid currentColor;
-  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
-  font-size: 16rem;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  background-color: transparent;
-  color: inherit;
-  transition:
-    background-color 0.6s var(--ease-ref),
-    color 0.6s var(--ease-ref);
-}
-
-.btn:hover {
-  background-color: var(--btn-fill);
-  color: var(--btn-ink);
-}
-
-[data-ground="dark"] .btn {
-  --btn-fill: var(--wh);
-  --btn-ink: var(--bk);
-}
-
-@media (max-width: 767.98px) {
-  .btn {
-    padding: 16rem 28rem;
-    font-size: 14rem;
-  }
-}
-
-/*
- * The P0 call to action. Registration is not open, so this is a stated status
- * rather than a button that goes nowhere: it takes no hover and no pointer.
- * See content/phases.ts in the codebase -- filling NEXT_PUBLIC_INTEREST_FORM_URL
- * is what turns this into a real link on the site.
- */
-.btn-pending {
-  cursor: default;
-}
-
-.btn-pending:hover {
-  background-color: transparent;
-  color: inherit;
-}
-
-/*
- * =============================================================================
- * DARK SECTIONS
- * =============================================================================
- * The page goes dark by painting individual sections, not by holding a theme.
- * There is no state, no toggle and no JavaScript: a section opts in and every
- * rule, link underline and button border inside it follows, because all of them
- * are drawn in currentColor. The header needs no involvement either -- its
- * mix-blend-mode difference already inverts it over any ground.
- */
-[data-ground="dark"] {
-  background-color: var(--bk);
-  color: var(--wh);
-}
-
-[data-ground="dark"] .dim {
-  color: var(--gr3-dark);
-}
-
-/* On black the real brand orange clears 8.9:1, so live state can use it. */
-[data-ground="dark"] .live {
-  color: var(--orange);
-}
-
-[data-ground="dark"] ::selection {
-  background: var(--orange);
-  color: var(--bk);
-}
-
-/*
- * =============================================================================
- * HEADER
- * =============================================================================
- * Fixed, with no background of its own.
- *
- * `mix-blend-mode: difference` over white text is what lets one header sit over
- * the artwork, over white sections and over the black ones without any of them
- * knowing about it: the blend inverts against whatever is behind, so the header
- * is black on white and white on black for free.
- *
- * The lockup is set at 500 because it has to hold its shape over the artwork.
- * Switzer is loaded as a variable face, so that is real weight rather than a
- * synthesised one -- which `font-synthesis-weight: none` would refuse to draw.
- *
- * There is no nav. This is one page; there is nowhere to navigate.
- */
-.hd {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 60;
-  width: 100%;
-  padding-top: 24rem;
-  padding-bottom: 24rem;
-  color: var(--wh);
-  mix-blend-mode: difference;
-  pointer-events: none;
-}
-
-.hd-in {
-  display: flex;
-  width: 100%;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.hd-mark {
-  pointer-events: auto;
-  display: block;
-  font-size: 19rem;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-weight: 500;
-}
-
-.hd-mark span {
-  display: block;
-}
-
-@media (max-width: 767.98px) {
-  .hd {
-    padding-top: 14rem;
-    padding-bottom: 14rem;
-  }
-  .hd-mark {
-    font-size: 14rem;
-  }
-}
-
-/*
- * A 3px rule across the top that fills as the page is read. White under
- * `difference` rather than a flat black bar, so it inverts against whatever
- * section is at the top of the viewport instead of vanishing into a dark one.
- */
-.prog {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 70;
-  height: 3rem;
-  width: 100%;
-  transform: scaleX(0);
-  transform-origin: left center;
-  background-color: var(--wh);
-  mix-blend-mode: difference;
-  pointer-events: none;
-}
-
-/*
- * =============================================================================
- * HERO
- * =============================================================================
- * The supplied key art, full bleed, with the title sitting on it. The artwork is
- * the only colour event on the page -- everything below it is monochrome. It is
- * the art exactly as supplied, cerulean and saffron, with no treatment over it.
- * The title is deliberately not set at display scale here: the image is the
- * statement, and the big type arrives in the section after it.
- */
-.hero {
-  position: relative;
-  height: 100vh;
-  min-height: 560rem;
-  width: 100%;
-  overflow: hidden;
-}
-
-/*
- * The artwork arrives as a band: closed to a zero-height sliver at the centre
- * line until the page is entered, then opening to full bleed. Clipped in the
- * static HTML before any script runs, and unclipped by the reduced-motion block
- * below for anyone who has asked for less movement.
- */
-.hero-clip {
-  position: absolute;
-  inset: 0;
-  clip-path: inset(50% 0 50% 0);
-  transition: clip-path 1.15s var(--ease-ref) 0.08s;
-}
-
-html[data-entered] .hero-clip {
-  clip-path: inset(0 0 0 0);
-}
-
-.hero-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/*
- * This is not a scrim over the artwork for its own sake -- it is what the header
- * blends against. `mix-blend-mode: difference` over a mid-tone returns another
- * mid-tone, so the lockup went muddy against the artwork exactly where it had no
- * other ground to fall back on. Darkening the top band pushes the difference
- * back to near-white and costs the image nothing below it.
- */
-.hero-scrim {
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 300rem;
-  background-image: linear-gradient(to bottom, rgb(0 0 0 / 0.62), rgb(0 0 0 / 0));
-  pointer-events: none;
-}
-
-.hero-body {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding-bottom: 38rem;
-}
-
-.hero-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 20rem;
-  color: var(--wh);
-}
-
-.hero-meta {
-  text-align: right;
-}
-
-@media (max-width: 767.98px) {
-  .hero-body {
-    padding-bottom: 20rem;
-  }
-  .hero-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 24rem;
-  }
-  .hero-meta {
-    text-align: left;
-  }
-}
-
-/*
- * =============================================================================
- * BLOCKS
- * =============================================================================
- * What the React components carried in Tailwind utilities, as named classes.
- */
-
-.prose {
-  display: flex;
-  max-width: 70ch;
-  flex-direction: column;
-  gap: 26rem;
-}
-
-.note {
-  padding-top: 24rem;
-}
-
-.cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rem;
-  padding-top: 40rem;
-}
-
-@media (max-width: 767.98px) {
-  .cta {
-    padding-top: 40rem;
-  }
-}
-
-/*
- * The closing statement. Nothing divides it from the button and the deadlines
- * line beneath -- the dark ground already reads as one surface, and a hairline
- * across a screen this quiet is one more thing than it needs. The padding the
- * rule used to sit on stays: only the line was in the way, not the air, and
- * without it the descenders of "in Singapore." come down onto the button.
- *
- * font-size is capped in vw, not rem, for the same reason .mark is: the root
- * font size stops shrinking at its clamp floor around 1728, so below that rem
- * no longer tracks the viewport. "in Singapore." is ~7.25em wide, and at 175rem
- * it overruns the container everywhere under about 1150 -- and an overrun line
- * WRAPS INSIDE ITS MASK, which is the one thing MASKED REVEAL forbids. 12vw is
- * the largest cap that still holds the line at 768, where the gap between the
- * root clamp and the viewport is worst.
- */
-.jn {
-  padding-bottom: 40rem;
-  font-size: min(130rem, 9vw);
-}
-
-/*
- * The countdown, which is the middle of that sentence rather than a widget above
- * it: the whole line is set in the serif that the sentence is set in, figures at
- * display size and unit words small beside them, sitting on one baseline because
- * they are inline siblings in a single line box.
- *
- * The line owns the size and the children take theirs in em, so one cap governs
- * the pair. It has to be restated here at all because the line box is struck
- * from the PARENT's size, and the parent is a 175rem heading -- without it the
- * line would reserve display leading it never uses.
- *
- * NO BOLD. Hedvig ships a single 400 face and font-synthesis-weight is off for
- * the page, so font-weight on it draws nothing; the emphasis is scale.
- *
- * ACCENT ON THE FIGURES ONLY. Live state is the accent's one job on this site
- * and a running clock is the literal case of it, but at this size the whole line
- * in orange is a colour field rather than a signal. The digits -- the part that
- * is actually live -- carry it, and the unit words stay in the sentence.
- *
- * THE LINE MOVES, AND THAT IS ACCEPTED. Hedvig's digits are proportional and the
- * face carries no tnum feature, so font-variant-numeric buys nothing: at 120px
- * "00" measures 143.3 and "11" measures 85.0, against a flat 137.5 for every
- * pair in Switzer. The seconds re-measure once a second and the words after them
- * shift. Setting the figures in the serif is the requirement; this is its price.
- *
- * Hidden in the static markup and unhidden by script -- and `display: block`
- * beats the UA's [hidden] rule, so that has to be restated or the empty line
- * opens a gap between the two serif lines for anyone without JS.
- */
-/* A plain margin is correct next to the masks above and below, even though they
- * carry negative ones: .e-lh's negative margin exactly cancels its own --off
- * padding, so the 48 is measured from the neighbouring line's ink either way.
- *
- * The cap exists for the same reason .jn's and .mark's do -- below about 1728
- * the root font size sits on its clamp floor and rem stops tracking the window
- * -- but it is in cqw, not vw, because what this line has to fit inside is the
- * lane, and the lane is not a fixed fraction of the viewport (see .lane-close).
- * Measured in vw it wrapped from 1280 down.
- *
- * Size it for the WIDEST the line can ever be, all zeros --
- * "00 months 00 days 00 hours 00 minutes 00 seconds" -- which measures 10.8x the
- * figure size, not for whatever figures happen to be showing. The gaps between
- * figure and word are inside that measurement, so widening them narrows the
- * figures: at these gaps the line is 11.55x the figure size, and 8.6cqw is that
- * ratio with a little air. */
-.cd-line {
-  display: block;
-  font-size: min(160rem, 8.6cqw);
-  line-height: 1;
-  margin: 48rem 0;
-}
-
-.cd-line[hidden],
-.cd-part[hidden] {
-  display: none;
-}
-
-.cd-n {
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 1em;
-  letter-spacing: -0.03em;
-}
-
-/* Tight to its own figure, open to the next pair -- which is what groups the
- * five pairs into five words instead of ten.
- *
- * BOTH GAPS ARE MEASURED IN THE em OF THE LINE, not of the word. An em on .cd-u
- * is 0.2625 of the line, so a gap written on it comes out about a quarter of
- * what it reads as -- which is exactly how the figures ended up touching their
- * words. .cd-n and .cd-part both inherit the line's size, so their padding says
- * what it means. Every 1rem of gap costs about 1rem off the figures, because the
- * cap below is sized to the finished line. */
-.cd-u {
-  font-family: var(--font-hedvig), ui-serif, Georgia, serif;
-  font-size: 0.2625em;
-  letter-spacing: 0;
-}
-
-.cd-n {
-  padding-right: 0.07em;
-}
-
-.cd-part {
-  padding-right: 0.15em;
-}
-
-/* Nothing follows the last pair, and its trailing gap is width the figures could
- * have had instead. */
-.cd-part:last-child {
-  padding-right: 0;
-}
-
-@media (max-width: 767.98px) {
-  /* All five pairs will not hold one line at 375, so the line is allowed to take
-   * two -- it is not inside a mask, and nothing here depends on its height. */
-  .cd-line {
-    font-size: 40rem;
-    line-height: 1.4;
-    margin: 28rem 0;
-  }
-  /* A looser ratio than the desktop 0.2625: at this size the unit words have to
-   * stay readable rather than stay proportional. */
-  .cd-u {
-    font-size: 0.33em;
-  }
-  .jn {
-    padding-bottom: 28rem;
-    font-size: 40rem;
-  }
-}
-
-/*
- * =============================================================================
- * FOOTER
- * =============================================================================
- * A colophon, not a directory. Where we are on the left, how to reach us on the
- * right, and the mark. It is the page's one permanently dark surface, which is
- * why the invitation above it arrives already dark.
- */
-.ftr {
-  padding-top: 90rem;
-  padding-bottom: 38rem;
-}
-
-.ftr-band {
-  padding-bottom: 40rem;
-}
-
-/* Placement only, and it lives here rather than at the call site because this
- * row does rearrange below 768px, where .grd collapses to a block stack and the
- * two cells simply follow each other. */
-.ftr-venue {
-  grid-column: 1 / span 6;
-}
-
-.ftr-reach {
-  grid-column: 11 / span 5;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 18rem;
-}
-
-.ftr-meta {
-  padding-top: 40rem;
-}
-
-.ftr-meta > :nth-child(1) {
-  grid-column: 1 / span 4;
-}
-.ftr-meta > :nth-child(2) {
-  grid-column: 5 / span 5;
-}
-.ftr-meta > :nth-child(3) {
-  grid-column: 10 / span 3;
-}
-.ftr-meta > :nth-child(4) {
-  grid-column: 13 / span 3;
-}
-
-/* The two-voice lockup: the name in the sans, the qualifier in the serif. */
-.lockup {
-  display: inline-flex;
-  flex-direction: column;
-}
-
-.lockup-name {
-  line-height: 1;
-}
-
-.lockup-sub {
-  padding-top: 8rem;
-}
-
-.ftr-venue > p {
-  padding-top: 20rem;
-}
-
-@media (max-width: 767.98px) {
-  .ftr {
-    padding-top: 60rem;
-    padding-bottom: 24rem;
-  }
-  .ftr-band {
-    padding-bottom: 30rem;
-  }
-  .ftr-reach {
-    align-items: flex-start;
-    padding-top: 40rem;
-  }
-  .ftr-meta {
-    padding-top: 24rem;
-    line-height: 1.6;
-  }
-}
-
-/*
- * -----------------------------------------------------------------------------
- * THE WORDMARK
- * -----------------------------------------------------------------------------
- * The last screen of the page: four capitals gutter to gutter. Set in the sans
- * at 500, the weight the header lockup already uses for APRU, so the giant
- * version is the same four letters and not a second identity. Typeset rather
- * than drawn, which keeps faith with the site's rule about not reconstructing an
- * institution's mark.
- *
- * It carries its own gutters -- .ctr's, to the pixel -- rather than sitting in
- * one, exactly as the real site has it.
- *
- * NO BLEND. On the site this is `mix-blend-mode: difference` so the halo's
- * colour reads straight through the letters as the ring turns behind them. There
- * is no halo here, and white capitals differenced against the black ground come
- * out white -- the identical result for the cost of a compositing layer. So the
- * letters are simply white. Restoring the ring means restoring the blend, and
- * the z-index above the canvas with it; see .mark in codebase/app/globals.css.
- */
-.mark {
-  font-family: var(--font-switzer), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 500;
-  padding: 0 30rem;
-
-  /*
-   * Solved, not eyeballed. A P R U advance 2.613em together in Switzer at 500,
-   * the gutter is 30rem a side against a root font size that is 1px at 1920, so
-   * at 34vw the four caps take ~92% of the container and `space-between` spends
-   * the remaining 8% on three gaps of about 2.7% each -- tight and even.
-   *
-   * One value, no breakpoint: the gutter is itself proportional, so the gap
-   * holds within half a percent from 1280 all the way to 2560. The clamp on the
-   * root font size is exactly why this cannot be rem.
-   */
-  font-size: 34vw;
-
-  /* Switzer's cap height is 0.738em at this weight and the leading is 0.74em, so
-   * the line box is the caps and almost nothing else: the mask hugs them, and
-   * APRU has no descender to buy room for. Tracking is off because
-   * `space-between` is already doing that job. */
-  line-height: 0.74;
-  letter-spacing: 0;
-
-  margin-top: 60rem;
-}
-
-/* .ln-mask is display:block and both selectors are (0,1,0), so this has to be
- * declared after it to win. The clip survives, and each letter arrives with the
- * same rise every other line of display type on the page uses. */
-.mark-row {
-  display: flex;
-  justify-content: space-between;
-}
-
-@media (max-width: 767.98px) {
-  .mark {
-    padding: 0 15rem;
-    margin-top: 60rem;
-  }
-}
+.d1 { animation-delay: 0.05s; }
+.d2 { animation-delay: 0.14s; }
+.d3 { animation-delay: 0.24s; }
 
 /*
  * =============================================================================
  * REDUCED MOTION
  * =============================================================================
- * Reveals resolve to their end state instantly, so the page is simply a static
- * document.
+ * The entrance resolves instantly and the page is simply a static document.
  */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .ln-mask > .ln,
-  .ln-mask > .wd {
-    transform: none !important;
-  }
-
-  .rise {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  /* The hero is simply already open. */
-  .hero-clip {
-    clip-path: none !important;
   }
 }
 </style>
-
-<!--
-  Every reveal on this page is a CSS end state that the script releases by adding
-  .is-in, and the hero's clip is released by [data-entered] on <html>. With
-  scripting off neither ever arrives, so the page renders blank but for the
-  header lockup: eight reveal blocks hold their opening state, and the artwork
-  stays clipped to nothing. These are the same three end states the
-  reduced-motion block at the foot of the stylesheet resolves to. No !important
-  needed -- they match the specificity of what they override and come after it.
--->
-<noscript><style>
-  .ln-mask > .ln,
-  .ln-mask > .wd { transform: none; }
-  .rise { opacity: 1; transform: none; }
-  .hero-clip { clip-path: none; }
-</style></noscript>
 </head>
 
 <body>
 
-<div class="prog" aria-hidden="true"></div>
-
-<header class="hd">
-  <div class="ctr hd-in">
-    <a class="hd-mark" href="/">
-      <span>APRU</span>
-      <span>Sustainable Cities</span>
-      <span class="f-serif">&amp; Landscapes</span>
+<header class="bar">
+  <div class="ctr">
+    <a href="/" aria-label="APRU-SCL 2027, Singapore — home">
+      <img
+        class="bar-logo rise"
+        src="images/logo.svg"
+        width="111"
+        height="61"
+        alt="APRU-SCL 2027 Singapore">
     </a>
   </div>
 </header>
 
-<main>
-
-  <!-- HERO ------------------------------------------------------------------ -->
-  <section class="hero">
-    <div class="hero-clip">
-      <picture>
-        <source
-          srcset="images/hero-1920.avif 1920w, images/hero-1280.avif 1280w, images/hero-768.avif 768w"
-          type="image/avif"
-          sizes="100vw">
-        <img
-          class="hero-img"
-          src="images/hero-768.webp"
-          width="1920"
-          height="1080"
-          alt="Aerial terrain artwork in saffron over cerulean — the visual identity of the 10th APRU Sustainable Cities and Landscapes conference.">
-      </picture>
-      <div class="hero-scrim" aria-hidden="true"></div>
-    </div>
-
-    <div class="ctr hero-body">
-      <div class="hero-row">
-        <h1 class="e-lh t-h3" data-reveal>
-          <span class="ln-mask"><span class="ln" style="transition-delay:0s">Bridging</span></span>
-          <span class="ln-mask"><span class="ln" style="transition-delay:0.08s">Resilience(s)</span></span>
-        </h1>
-        <div class="t-b2 hero-meta rise" data-reveal>
-          <p>21–23 May 2027</p>
-          <p>NUS Department of Architecture</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- THE THEME -------------------------------------------------------------- -->
-  <section id="theme" class="pad">
-    <div class="ctr">
-      <!--
-        DOM order is label, title, body -- which is what the mobile stack wants,
-        since .grd is a block there. Every other width places the cells by column
-        and row, so above 1280 the title lands on the right with the body centred
-        beside it, and below that the body drops underneath.
-      -->
-      <div class="grd">
-        <div class="lane-right-label sec-spine sec-head">
-          <p class="sec-label">The theme</p>
-        </div>
-
-        <!--
-          The masks are not only the reveal. .e-lh is what stops the mask
-          clipping the descender of "Bridging", and the pair of them is what
-          holds the two lines apart at all -- see THE THEME'S TITLE. Neither is
-          optional here, and a plain <span> in their place puts the lines back on
-          top of each other.
-        -->
-        <div class="lane-title">
-          <h2 class="e-lh t-h2 ttl" data-reveal>
-            <span class="ln-mask"><span class="ln" style="transition-delay:0s">Bridging</span></span>
-            <span class="ln-mask"><span class="ln" style="transition-delay:0.08s">Resilience(s)</span></span>
-          </h2>
-        </div>
-
-        <div class="lane-right-body">
-          <div class="t-b1 prose" data-reveal>
-            <p class="rise">
-              Amid climate change, economic and technological uncertainties, and social and
-              environmental disruptions, cities and communities across the Pacific Rim are
-              facing profound and unprecedented challenges. In addressing these challenges,
-              however, the knowledge and practices of sustainable planning, governance, and
-              design often remain siloed and fragmented.
-            </p>
-            <p class="rise" style="transition-delay:0.08s">
-              With the theme of Bridging Resilience(s), the 2027 APRU-SCL conference will
-              explore how different knowledges and practices can connect and coalesce in
-              advancing social, cultural, and environmental resilience in cities and
-              communities. It will further examine how bridging itself — the ability to
-              network, organize, co-create, and forge connections — can represent a form of
-              resilience in the face of crisis and disruption.
-            </p>
-            <p class="rise" style="transition-delay:0.16s">
-              Singapore, with its unique institutional structure along with the challenges of
-              density and land scarcity, provides a setting for this discussion. For the 2027
-              conference, we welcome submissions of papers, posters, and panels that examine
-              solutions and challenges facing urban and environmental sustainability in the
-              Pacific Rim through transdisciplinary collaboration, comparative studies, and
-              cross-cultural investigation.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- THE INVITATION --------------------------------------------------------- -->
-  <!--
-    The page goes dark here and stays dark. On the real site a 200vh pinned
-    curtain wipes it black; that needs a scroll driver a holding page has not
-    earned, and this is the same end state. It has to happen somewhere: the
-    footer is permanently dark, so a page that ended light would butt onto it at
-    a hard seam.
-  -->
-  <section id="join" class="pad" data-ground="dark">
+<main class="stage ctr">
+  <picture>
     <!--
-      One column in from the page gutter, not the eight-column lane the rest of
-      the page keeps to: at t-h1 "in Singapore." is 969rem against that lane's
-      982rem, close enough that a wrap is one font tweak away -- and a wrapping
-      line inside .ln-mask breaks the clip, see MASKED REVEAL. Column 2 leaves
-      the statement and the clock room and still holds them off the edge.
+      [BLOCKED] A portrait crop of the key visual has been requested from the
+      client for phones. The artwork is 16:9 with its title running across
+      almost its full width, so at 375px the type is around 5px tall. When the
+      vertical version arrives, add it here as the first source:
+
+        <source media="(max-width: 767.98px)"
+                srcset="images/hero-portrait.avif" type="image/avif">
+
+      Until then phones get the full 16:9 artwork and the page scrolls rather
+      than holding to one screen -- see the media query on `body`. That is the
+      interim state, not a bug.
     -->
-    <div class="ctr">
-      <div class="grd">
-        <div class="lane-close">
-          <h2 class="e-lh t-h1 jn" data-reveal>
-            <span class="ln-mask"><span class="ln" style="transition-delay:0s">Join us in</span></span>
-
-            <!--
-              The clock is inside the sentence, so the heading reads "Join us in
-              8 months 21 days in Singapore." -- the finer units are aria-hidden and
-              nothing is a live region, so it is spoken once rather than every second.
-
-              `hidden` in the static markup and unhidden by script: without JS the
-              two serif lines simply close up, with no gap and nothing lost, since
-              the date is already in the hero and in the footer.
-            -->
-            <span class="cd-line rise" data-countdown data-target="2027-05-20T16:00:00Z"
-                  style="transition-delay:0.08s" hidden>
-                <span class="cd-part" data-cd-part="months"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
-                <span class="cd-part" data-cd-part="days"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
-                <span class="cd-part" data-cd-part="hours" aria-hidden="true"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
-                <span class="cd-part" data-cd-part="minutes" aria-hidden="true"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
-                <span class="cd-part" data-cd-part="seconds" aria-hidden="true"><span class="cd-n live" data-cd-v></span><span class="cd-u"></span></span>
-            </span>
-
-            <span class="ln-mask"><span class="ln" style="transition-delay:0.16s">in Singapore.</span></span>
-          </h2>
-
-          <div class="cta rise" data-reveal>
-            <span class="btn btn-pending dim" title="This link will be published shortly">Registrations open soon!</span>
-          </div>
-
-          <!-- The deadlines, in the one line the page is carrying them in. -->
-          <p class="t-b2 dim note">
-            Call for abstracts, registration and submission deadlines will be announced here.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
+    <source
+      srcset="images/hero-1920.avif 1920w, images/hero-1280.avif 1280w, images/hero-768.avif 768w"
+      type="image/avif"
+      sizes="100vw">
+    <img
+      class="stage-img rise d1"
+      src="images/hero-768.webp"
+      width="2320"
+      height="1305"
+      alt="Bridging Resilience(s): The 10th Sustainable Cities and Landscapes Conference. 21–23 May 2027, Singapore. Presented by APRU and the NUS Department of Architecture, College of Design and Engineering.">
+  </picture>
 </main>
 
-<footer class="ftr" data-ground="dark">
+<footer class="ftr">
   <div class="ctr">
-    <!-- One band. Venue left, contact right -- set as a single row on the fifteen
-         rather than as columns, because two facts do not make a directory. -->
-    <div class="grd ftr-band" data-reveal>
-      <div class="ftr-venue rise">
-        <span class="lockup">
-          <span class="t-h4 lockup-name">NUS</span>
-          <span class="t-b2 dim f-serif lockup-sub">Department of Architecture · CDE</span>
-        </span>
-        <p class="t-b2 dim">Kent Ridge campus, Singapore</p>
-      </div>
+    <div class="ftr-in">
+      <p class="ftr-note rise d2">
+        Our full website will be launching in mid-September 2026.
+        Please check back soon for updates.
+      </p>
 
-      <div class="ftr-reach rise" style="transition-delay:0.1s">
-        <!-- [OPEN] No conference address is published yet, and CONTENT-REVIEW.md
-             rules out publishing individual ones. Replace this line with
-             <a class="t-b1 link" href="mailto:…">…</a> once there is a general
-             address. -->
-        <p class="t-b1 dim">Contact details to follow</p>
-      </div>
-    </div>
-  </div>
+      <!-- Address exactly as supplied by the department, postcode spacing
+           included. NUS's own house style writes it unspaced as 117566. -->
+      <address class="ftr-addr rise d3">
+        <span class="ftr-lines">Department of Architecture<br>
+        National University of Singapore<br>
+        College of Design and Engineering<br>
+        4 Architecture Drive<br>
+        Singapore 117 566</span>
 
-  <!-- The mark, and it sits OUTSIDE the container, carrying .ctr's gutters
-       itself -- see THE WORDMARK. -->
-  <div class="mark ln-mask mark-row" data-reveal>
-    <span class="wd" style="transition-delay:0s">A</span>
-    <span class="wd" style="transition-delay:0.09s">P</span>
-    <span class="wd" style="transition-delay:0.18s">R</span>
-    <span class="wd" style="transition-delay:0.27s">U</span>
-  </div>
-
-  <div class="ctr">
-    <div class="grd ftr-meta t-b2 dim rise" data-reveal>
-      <p>The 10th Conference of APRU-SCL</p>
-      <p>NUS Department of Architecture, College of Design and Engineering</p>
-      <p>21–23 May 2027 · Kent Ridge campus, Singapore</p>
-      <p class="tnum">© 2027 NUS Department of Architecture</p>
+        <a class="link ftr-mail" href="mailto:apru-scl2027@nus.edu.sg">apru-scl2027@nus.edu.sg</a>
+      </address>
     </div>
   </div>
 </footer>
-
-<script>
-/*
- * Four behaviours, no dependencies.
- *
- * Reveals are CSS transitions, not JS animations: the elements already carry
- * their end-state classes, and all this does is add `.is-in` once, which
- * releases every mask and rise inside. That is the same contract as
- * components/motion/Reveal.tsx in the codebase, down to the observer's margins.
- */
-(function () {
-  var root = document.documentElement;
-  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // Opens .hero-clip, so the artwork arrives as a widening band. The real site
-  // holds this until the preloader's panels retract; there is no loading screen
-  // here, so it fires on the first frame.
-  requestAnimationFrame(function () {
-    root.dataset.entered = "";
-  });
-
-  var nodes = document.querySelectorAll("[data-reveal]");
-
-  if (reduced || !("IntersectionObserver" in window)) {
-    // Belt and braces: without an observer the page must still be readable.
-    Array.prototype.forEach.call(nodes, function (node) {
-      node.classList.add("is-in");
-    });
-  } else {
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-in");
-          observer.unobserve(entry.target);
-        });
-      },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.05 }
-    );
-    Array.prototype.forEach.call(nodes, function (node) {
-      observer.observe(node);
-    });
-  }
-
-  /*
-   * The countdown, which is the middle of the sentence around it.
-   *
-   * The target is midnight of 21 May 2027 in Singapore, which is UTC+8 and has
-   * no daylight saving, so the instant is fixed: 2027-05-20T16:00:00Z. It lives
-   * in data-target rather than here, so the date is edited in one place.
-   *
-   * MONTHS ARE CALENDAR ARITHMETIC, not division. A month is not 30 days, and
-   * over a run this long dividing would be days out. addMonths steps whole
-   * calendar months and clamps to the end of a short one, so the 31st does not
-   * overflow into the next month the way setMonth alone would.
-   *
-   * Leading units drop off while they are zero -- it never reads "00 months
-   * 21 days" -- but an interior zero stays, so "08 months 00 days 04 hours" is
-   * intact.
-   *
-   * Under reduced motion only months and days are rendered and no interval runs.
-   * Freezing the finer units would be worse than leaving them out: a still
-   * "36 minutes 53 seconds" is wrong within the minute, while the coarse ones
-   * stay true for as long as the page is open.
-   */
-  var line = document.querySelector("[data-countdown]");
-  var target = line ? Date.parse(line.getAttribute("data-target")) : NaN;
-
-  if (line && !isNaN(target)) {
-    var parts = Array.prototype.slice.call(line.querySelectorAll(".cd-part"));
-
-    // months and days -- the two that are still true a minute from now
-    var COARSE = 2;
-
-    var addMonths = function (d, n) {
-      var r = new Date(d.getTime());
-      r.setFullYear(d.getFullYear(), d.getMonth() + n, 1);
-      var last = new Date(r.getFullYear(), r.getMonth() + 1, 0).getDate();
-      r.setDate(Math.min(d.getDate(), last));
-      return r;
-    };
-
-    var pad2 = function (n) {
-      return (n < 10 ? "0" : "") + n;
-    };
-
-    var tick = function () {
-      var now = new Date();
-      var shown = false;
-
-      if (target - now.getTime() > 0) {
-        var months = 0;
-        while (addMonths(now, months + 1).getTime() <= target) months++;
-
-        var ms = target - addMonths(now, months).getTime();
-        var values = [
-          months,
-          Math.floor(ms / 864e5),
-          Math.floor(ms / 36e5) % 24,
-          Math.floor(ms / 6e4) % 60,
-          Math.floor(ms / 1e3) % 60
-        ];
-
-        parts.forEach(function (part, i) {
-          var v = values[i];
-          var use = (shown || v > 0) && (!reduced || i < COARSE);
-
-          part.hidden = !use;
-          if (!use) return;
-
-          shown = true;
-
-          var word = part.getAttribute("data-cd-part");
-          part.querySelector("[data-cd-v]").textContent = pad2(v);
-          part.querySelector(".cd-u").textContent = v === 1 ? word.slice(0, -1) : word;
-        });
-      }
-
-      // Nothing left to count, or nothing left that this reader is being shown:
-      // the line goes away and the two serif lines close up over it.
-      line.hidden = !shown;
-      return shown;
-    };
-
-    if (tick() && !reduced) {
-      setInterval(tick, 1000);
-    }
-  }
-
-  var bar = document.querySelector(".prog");
-  var onScroll = function () {
-    var max = root.scrollHeight - window.innerHeight;
-    bar.style.transform = "scaleX(" + (max > 0 ? window.scrollY / max : 0) + ")";
-  };
-  onScroll();
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll);
-})();
-</script>
 
 </body>
 </html>
