@@ -8,10 +8,6 @@
 <meta name="description" content="Bridging Resilience(s) — The 10th Conference of APRU-SCL, 21–23 May 2027, Singapore. Hosted by the NUS Department of Architecture, College of Design and Engineering.">
 <link rel="canonical" href="https://apruscl2027.com/">
 
-<!-- SVG first for anything modern; the PNG is the fallback and doubles as the
-     iOS home-screen icon. Both are the APRU-SCL 2027 Singapore lockup, which
-     is now the only place that mark appears -- the page itself carries no
-     lockup, since the artwork already holds the APRU and NUS marks. -->
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="icon" href="icon.png" sizes="180x180">
 <link rel="apple-touch-icon" href="icon.png">
@@ -22,19 +18,25 @@
 <meta property="og:description" content="Bridging Resilience(s) — The 10th Conference of APRU-SCL, 21–23 May 2027, Singapore. Hosted by the NUS Department of Architecture, College of Design and Engineering.">
 <meta property="og:url" content="https://apruscl2027.com/">
 <meta property="og:locale" content="en_SG">
-<!-- [OPEN] og.png still carries the superseded artwork. Regenerating it from
-     the 3 Sept key visual is a five-minute job in the same pipeline that built
-     images/hero-*.avif; it was deliberately left out of this pass. -->
-<meta property="og:image" content="https://apruscl2027.com/og.png">
+<meta property="og:image" content="https://apruscl2027.com/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<!-- Regenerated from the 3 Sept key visual by rendering this very page at
+     1200x630, so the share card and the site cannot drift apart. JPEG rather
+     than PNG: the marbling is photographic noise, which PNG stores at 1.4 MB
+     and a quality-84 JPEG at 326 KB with no visible loss. -->
 <meta property="og:image:alt" content="Bridging Resilience(s) — the 10th Conference of APRU-SCL, 21-23 May 2027, Singapore">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Bridging Resilience(s) · The 10th Conference of APRU-SCL">
 <meta name="twitter:description" content="Bridging Resilience(s) — The 10th Conference of APRU-SCL, 21–23 May 2027, Singapore. Hosted by the NUS Department of Architecture, College of Design and Engineering.">
-<meta name="twitter:image" content="https://apruscl2027.com/og.png">
+<meta name="twitter:image" content="https://apruscl2027.com/og.jpg">
 
-<link rel="preload" href="fonts/AtlasGrotesk-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<!-- The two faces the key visual is set in. Both are above the fold and both
+     are on the critical path for the title, so both are preloaded; Regular is
+     footer-only and is left to load normally. -->
+<link rel="preload" href="fonts/AtlasGrotesk-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/AtlasGrotesk-Light.woff2" as="font" type="font/woff2" crossorigin>
 
 <style>
 /*
@@ -45,39 +47,57 @@
  *
  * Two screens and nothing else. The key visual fills the first, edge to edge;
  * scrolling past it brings up the launch notice and the department's address,
- * and the page ends. There is no header, no lockup and no navigation -- the
- * artwork already carries the conference title, the dates, the APRU roundel and
- * the NUS lockup, so anything laid over it would be saying it twice.
+ * and the page ends.
  *
- * THE ARTWORK IS THE CONTENT, and that governs the one real decision here:
+ * -----------------------------------------------------------------------------
+ * THE KEY VISUAL IS REBUILT, NOT PLACED
+ * -----------------------------------------------------------------------------
+ * The previous build shipped the designer's artwork as one flat image with the
+ * title and the two marks baked into it. That forced a bad trade: `cover` takes
+ * its crop off whichever axis is over-long, and the title runs to 95% of the
+ * artwork's width, so any viewport that was not 16:9 ate into the words. A
+ * portrait phone lost the title completely, and the fallback was to letterbox.
  *
- *   Its title is typeset INTO the image, in the upper left, running to about
- *   95% of the image width. So `cover` -- which is what filling the screen
- *   means -- is destructive by nature: every pixel of viewport aspect that
- *   differs from the artwork's own 16:9 is taken off the sides, and the title
- *   is what sits there. At 16:9 nothing is lost; at 16:10 it just reaches the
- *   first and last letters; on a portrait phone it would remove the title
- *   entirely. Landscape therefore covers and accepts the trim, and portrait
- *   falls back to the whole uncropped image -- see THE HERO.
+ * So the artwork is now assembled here instead of arriving pre-composed:
  *
- *   Its text is also pixels, not text. The alt attribute is the only way a
- *   screen reader or a crawler reaches that content, so it carries all of it
- *   verbatim rather than describing the picture.
+ *   - The BACKGROUND is the designer's marbled plate, supplied clean (no type,
+ *     no marks) as a 11811x7874 CMYK/FOGRA39 TIFF-grade JPEG. Converted to sRGB
+ *     through its embedded profile and cut to AVIF/WebP. It is pure texture, so
+ *     `cover` may now crop it freely at any aspect ratio -- nothing is lost.
+ *
+ *   - The TITLE is real text in Atlas Grotesk, so it reflows, scales, selects,
+ *     translates and reads aloud.
+ *
+ *   - The MARKS are the designer's own SVGs, so they stay sharp at any size.
+ *
+ * Every measurement below was taken off the designer's 1920x1080 render and is
+ * reproduced exactly at that aspect ratio -- see THE SCALE UNIT. The numbers in
+ * the comments are the source pixels at 1920 so they can be checked against it.
  */
 
 /*
  * -----------------------------------------------------------------------------
  * FACES
  * -----------------------------------------------------------------------------
- * Atlas Grotesk -- the face the artwork itself is set in, so the page type and
- * the image type are one voice. Subset from the supplied desktop OTFs to the
- * ~120 characters this page can use, which is what takes each file from 649
- * glyphs to under 9 KB.
+ * Atlas Grotesk, subset from the supplied desktop OTFs to the ~95 characters
+ * this page can use -- which is what takes each file from 649 glyphs to ~12 KB.
+ *
+ * Light is new in this pass. The artwork's date line is Light, not Regular:
+ * its stems measure 0.107 of its cap height against 0.135-ish for Regular and
+ * 0.20 for the Bold above it.
  *
  * [OPEN] These were supplied as DESKTOP licences. fsType permits embedding, but
  * Commercial Type sells webfont licences separately -- to be confirmed with the
  * client before the domain is pointed here.
  */
+@font-face {
+  font-family: atlas;
+  src: url("fonts/AtlasGrotesk-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+}
+
 @font-face {
   font-family: atlas;
   src: url("fonts/AtlasGrotesk-Regular.woff2") format("woff2");
@@ -91,7 +111,7 @@
   src: url("fonts/AtlasGrotesk-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 /*
@@ -100,6 +120,7 @@
  * -----------------------------------------------------------------------------
  * Root font size is set in vw, so 1rem is ~1px at 1920 and every length written
  * in rem below scales with the viewport instead of stepping at breakpoints.
+ * This governs the FOOTER only. The hero has its own unit -- see below.
  */
 :root {
   font-size: clamp(0.05625rem, 0.0520833333vw, 0.075rem);
@@ -116,11 +137,10 @@
   --bk: #111111;
   --gr: #6e6e6e;
 
-  /* The artwork's own blue, sampled from the field rather than picked by eye:
-   * quantising the image to eight buckets puts a fifth of it within a shade of
-   * this. It backs the letterbox on portrait screens, so the bands read as more
-   * of the picture instead of as a white frame around it. */
-  --art-blue: #4a96c9;
+  /* The artwork's own blue, sampled from the plate after the ICC conversion
+   * rather than picked by eye: quantising it to four buckets puts a third of
+   * the image within a shade of this. */
+  --art-blue: #4896bf;
 
   --font-atlas: atlas;
 
@@ -162,6 +182,11 @@ a {
   text-decoration: none;
 }
 
+img,
+svg {
+  display: block;
+}
+
 ::selection {
   background: var(--art-blue);
   color: var(--wh);
@@ -172,67 +197,360 @@ a {
   outline-offset: 4rem;
 }
 
-/* A 30px page gutter at 1920. The hero deliberately sits outside it. */
+/* The page gutter, matched to the artwork's own: 85px at 1920, or 4.43%. The
+ * hero sets the same figure in its own unit, so the footer's text edge lines up
+ * with the marks above it. */
 .ctr {
   width: 100%;
-  padding: 0 30rem;
+  padding: 0 4.4271%;
 }
 
-@media (max-width: 767.98px) {
+/* The hero opens its gutter up on narrow screens (4.43% of a 390px phone is a
+ * 17px margin, which is mean). The footer has to follow on exactly the same
+ * condition, or the two columns step apart at the fold -- most visibly on a
+ * portrait tablet, which is wider than the phone breakpoint but still uses the
+ * hero's narrow layout. */
+@media (max-aspect-ratio: 1/1), (max-width: 767.98px) {
   .ctr {
-    padding: 0 20rem;
+    padding: 0 6.5%;
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* THE HERO                                                                   */
-/* -------------------------------------------------------------------------- */
 /*
- * One full viewport of artwork, flush to all four edges.
+ * =============================================================================
+ * THE HERO
+ * =============================================================================
+ */
+
+/*
+ * -----------------------------------------------------------------------------
+ * THE SCALE UNIT
+ * -----------------------------------------------------------------------------
+ * Everything in the key visual is a multiple of --u, which is 1% of the hero's
+ * width. Set every length that way and the whole composition scales as one
+ * piece, holding the designer's proportions exactly at 16:9 and staying in
+ * proportion at every other landscape ratio.
  *
+ * It is a CONTAINER unit, not vw, for one specific reason: the page scrolls, so
+ * on any desktop with classic scrollbars 100vw is wider than the content box by
+ * the scrollbar's width. Sizing the title in vw would push its longest line a
+ * few pixels past the right gutter and put a horizontal scrollbar on the page.
+ * 1cqw is measured off the hero's own box, which is the box the text actually
+ * has to fit inside.
+ *
+ * vw is the fallback for anything without container queries; it is wrong by the
+ * width of a scrollbar and right about everything else.
+ *
+ * WHY THE GUTTER LIVES ON AN INNER ELEMENT: 1cqw is 1% of the container's
+ * CONTENT box. Put the 4.43% gutter on .hero itself and the unit is measured
+ * across what is left after both gutters, which is a 91% unit -- and since the
+ * gutter is itself written in that unit, it settles into a composition 9% too
+ * small at every size. So .hero is the container and carries no padding, and
+ * .hero-in holds the gutter and the layout.
+ */
+.hero {
+  --u: 1vw;
+}
+
+@supports (container-type: size) {
+  .hero {
+    container-type: size;
+    --u: 1cqw;
+  }
+}
+
+/*
  * 100dvh, not 100vh -- on mobile Safari and Chrome 100vh is the height the
  * viewport has with the address bar RETRACTED, so at rest the image would run
  * under the browser chrome and the page would start already scrolled.
  */
 .hero {
+  position: relative;
   height: 100dvh;
   width: 100%;
   overflow: hidden;
   background-color: var(--art-blue);
+  color: var(--wh);
 }
 
-.hero picture,
+/*
+ * The gutter and the layout. Top and bottom are anchored and the space between
+ * them is slack, so the title sits under the top edge and the marks sit on the
+ * bottom one however tall the screen is.
+ *
+ * The top padding is a fallback value -- see THE CAP LINE below, which replaces
+ * it wherever text-box-trim is available.
+ */
+.hero-in {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(3.5484 * var(--u)) calc(4.4271 * var(--u)) calc(4.4271 * var(--u));
+}
+
+/* The plate, behind everything, filling the hero. */
+.hero-bg,
 .hero-img {
-  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   width: 100%;
   height: 100%;
 }
 
 .hero-img {
   object-fit: cover;
-  object-position: center;
+
+  /* Not `center`. The designer's 16:9 render is a horizontal band cut out of a
+   * 3:2 plate, and it does not sit in the middle of it -- correlating the two
+   * with the baked-in type masked out puts the band's top 10.6% down the plate,
+   * which for a 16:9 box is 68% of the vertical overflow. So this reproduces
+   * the designer's framing at 16:9, and keeps the same part of the marbling
+   * under the type at every other ratio. */
+  object-position: center 68%;
+}
+
+/* -------------------------------------------------------------------------- */
+/* THE TITLE                                                                  */
+/* -------------------------------------------------------------------------- */
+/*
+ * Measured off the designer's render at 1920x1080:
+ *
+ *   cap height, lines 1-2   47px  ->  61px at Atlas's 0.765 cap ratio
+ *   cap height, line 3      42px  ->  55px
+ *   baseline to baseline    75px  ->  1.2295em on a 61px body
+ *   line 2's ink width    1745px  ->  which is what pins the tracking below
+ *   left edge of the ink    85px
+ *   cap line of line 1      87px
+ *
+ * The tracking is not a guess: it is whatever reproduces those ink widths in a
+ * browser, measured back off the render rather than solved on paper. (Solving
+ * it offline gets close but lands about 0.5% tight, because the shaping there
+ * did not apply the font's kern table and the artwork and the browser both do.)
+ * The date line is tracked more than twice as wide as the title -- that is a
+ * deliberate choice in the artwork, not a measurement error, and is reproduced
+ * as found.
+ *
+ * WHY THE LINES DO NOT WRAP: line 2 is 1740px of ink in a 1750px content box.
+ * The designer cut it that fine, and since the type is sized in the same unit
+ * as the gutter, that 99.4% holds at every width -- it fits everywhere or
+ * nowhere. But it leaves nothing for rounding, so the line break is explicit
+ * and wrapping is off. Left to itself, a sub-pixel overshoot would drop
+ * "Conference" onto a line of its own and the whole composition would jump.
+ */
+.kv-title {
+  font-size: var(--fs-t);
+  font-weight: 700;
+  line-height: 1.2295;                     /* 75px baseline to baseline */
+  letter-spacing: 0.0219em;
+}
+
+.kv-title span {
+  display: block;
+  white-space: nowrap;
 }
 
 /*
- * Portrait and square viewports do NOT crop.
+ * The designer set the title's box 4px left of the marks' at 1920, which is
+ * almost exactly the left side bearing of the "B" -- so in the artwork the stem
+ * of "Bridging" and the left edge of the APRU roundel stand on the same line.
+ * Align the boxes instead and the type hangs inside the marks, which at this
+ * size is visible.
  *
- * Cover takes its trim off whichever axis is over-long, and on a screen taller
- * than it is wide that is the width -- the axis the artwork's title runs along.
- * A phone would lose the title completely, which is most of what the image is
- * for. So below square the whole picture is shown and the leftover height is
- * filled with the artwork's own blue, set on .hero above.
- *
- * Keyed on aspect ratio, not width: the condition is genuinely "is this
- * viewport narrower than it is tall", not "is this a phone". A landscape phone
- * covers like anything else.
- *
- * [BLOCKED] When the client sends the portrait crop of the key visual, add it
- * as the first <source> in the markup below and this fallback can go -- portrait
- * screens would then cover a portrait asset and fill the screen properly too.
+ * The correction is a share of the TYPE size, not of the viewport, because that
+ * is what a side bearing is. Writing it that way means the narrow layout, whose
+ * type is proportionally much larger, gets the right nudge for free.
  */
-@media (max-aspect-ratio: 1/1) {
-  .hero-img {
-    object-fit: contain;
+.kv {
+  --fs-t: calc(3.1771 * var(--u));            /* 61px at 1920 */
+  margin-left: calc(-0.0656 * var(--fs-t));   /* the "B" side bearing: 4px */
+}
+
+/*
+ * The ordinal in "The 10th".
+ *
+ * In the artwork the "th" is 0.583 of the full size and its ASCENDER sits on
+ * the cap line of the line it is in, which puts its baseline 19px above the
+ * main baseline. `bottom` resolves against the element's own font size, so that
+ * 19px is 19 / (0.583 x 61) = 0.534em here, not 0.311em of the parent.
+ *
+ * vertical-align is reset because the UA default of `super` would raise it
+ * again on top of this.
+ */
+.kv-title sup {
+  font-size: 0.583em;
+  vertical-align: baseline;
+  position: relative;
+  bottom: 0.534em;
+}
+
+/*
+ * 55px at 1920, its cap line 31px under line 2's baseline.
+ *
+ * The margin is the leftover once the line box's own half-leading is accounted
+ * for -- 9.28px of the gap, minus (66 - 55) / 2, leaves 3.78px.
+ */
+.kv-date {
+  margin-top: calc(0.197 * var(--u));
+  font-size: calc(0.9016 * var(--fs-t));   /* 55px at 1920 */
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: 0.0509em;
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * THE CAP LINE
+ * -----------------------------------------------------------------------------
+ * Everything above is measured to the CAP LINE of the type, because that is
+ * what the eye reads as the top edge and what a designer measures in Illustrator.
+ * CSS measures to the top of the line box, which is a different thing: it adds
+ * half-leading, plus the gap between the ascender and the cap.
+ *
+ * That gap is not a constant. It comes out of the font's vertical metrics, and
+ * browsers do not agree on which set to read -- Chrome on Windows takes OS/2
+ * usWinAscent (1.202em here), everything on macOS takes hhea ascent (0.812em).
+ * The same stylesheet therefore puts this title 10px lower on Windows than on a
+ * Mac, at 1920, purely from metric choice. The values above are tuned to
+ * Windows because that is where most of the traffic is, and they are wrong
+ * everywhere else.
+ *
+ * text-box-trim removes the question. It trims the line box back to the cap
+ * height at the top and the alphabetic baseline at the bottom, so the block's
+ * edges ARE the cap line and the baseline, and these two numbers become the
+ * designer's own measurements off the artwork:
+ *
+ *   87px   cap line of line 1, from the top of the artwork
+ *   31px   baseline of line 2 to the cap line of the date
+ *
+ * No font metrics, no browser disagreement, no tuning.
+ */
+@supports (text-box-trim: trim-both) {
+  .kv-title,
+  .kv-date {
+    text-box-trim: trim-both;
+    text-box-edge: cap alphabetic;
+  }
+
+  .hero-in {
+    padding-top: calc(4.5313 * var(--u));
+  }
+
+  .kv-date {
+    margin-top: calc(1.6146 * var(--u));
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* THE MARKS                                                                  */
+/* -------------------------------------------------------------------------- */
+/*
+ * Bottom left, both sitting on a common baseline 85px off the foot of the
+ * artwork. Widths and the gap between them are straight off the render:
+ *
+ *   APRU        273px  ->  14.219%
+ *   gap          72px  ->   3.750%
+ *   NUS lockup  570px  ->  29.688%
+ *
+ * Both SVGs' ink fills its viewBox edge to edge, so aligning the boxes' bottom
+ * edges is the same as aligning the marks themselves -- which is why this is
+ * `flex-end` and not a baseline trick. The APRU roundel is the taller of the
+ * two and overhangs the NUS lockup by 8px at 1920, exactly as it does in the
+ * artwork.
+ */
+.kv-marks {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(3.75 * var(--u));
+}
+
+.mark-apru {
+  width: calc(14.219 * var(--u));
+  height: auto;
+}
+
+.mark-nus {
+  width: calc(29.688 * var(--u));
+  height: auto;
+}
+
+/*
+ * -----------------------------------------------------------------------------
+ * NARROW AND PORTRAIT
+ * -----------------------------------------------------------------------------
+ * Below square -- or on any phone-width screen -- the artwork's own proportions
+ * stop being useful. Line 2 is 53 characters and would have to shrink to about
+ * 12px to hold two lines on a phone, so instead the type goes UP as a share of
+ * the width, wraps to as many lines as it needs, and the block centres itself
+ * in the screen. The marks stack and grow enough for the department line under
+ * the NUS lockup to stay readable.
+ *
+ * Keyed on aspect ratio as well as width because the condition is genuinely "is
+ * there room for a 53-character line", not "is this a phone".
+ */
+@media (max-aspect-ratio: 1/1), (max-width: 767.98px) {
+  .hero-in {
+    padding: calc(9 * var(--u)) calc(6.5 * var(--u));
+  }
+
+  /*
+   * The one place a fixed length is mixed into the scale, and deliberately.
+   * A pure percentage that reads well on a 390px phone is overbearing by the
+   * time the same layout reaches a 768px tablet -- 8.5% is 33px on one and 65px
+   * on the other. Adding a constant makes the ramp sublinear: 34px at 390,
+   * 49px at 768, and still 31px on a 320px screen.
+   */
+  .kv {
+    --fs-t: calc(4cqw + 18px);
+
+    /* Grow into all the room above the marks and centre inside it. Three
+     * competing auto margins would only put the block a third of the way
+     * down. */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .kv-title {
+    line-height: 1.16;
+  }
+
+  /* Wrapping is what this layout is for -- see .kv-title above for why it is
+   * switched off in the wide one. */
+  .kv-title span {
+    white-space: normal;
+    text-wrap: pretty;
+  }
+
+  /* No font-size here: the base rule already ties the date to --fs-t at the
+   * artwork's 55/61 ratio, and --fs-t is re-ramped above. Overriding it again
+   * pushed the date past the gutter and broke "Singapore" onto its own line on
+   * screens that had room for it. */
+  .kv-date {
+    margin-top: calc(3 * var(--u));
+  }
+
+  /* Stacked, and left where the flex line ends -- the foot of the screen. */
+  .kv-marks {
+    display: block;
+
+    /* Same sublinear ramp as the type, so the department line under the NUS
+     * lockup stays readable on a phone without the pair taking over a tablet.
+     * The 2.088 is the two marks' width ratio in the artwork, kept exactly. */
+    --mark: calc(21cqw + 57.5px);
+  }
+
+  .mark-apru {
+    width: var(--mark);
+  }
+
+  .mark-nus {
+    width: calc(2.088 * var(--mark));
+    margin-top: calc(5 * var(--u));
   }
 }
 
@@ -339,9 +657,9 @@ a {
  * -----------------------------------------------------------------------------
  * ENTRANCE
  * -----------------------------------------------------------------------------
- * One keyframe on load, and only on the hero. The footer is below the fold now,
- * so animating it would mean an observer, and an observer means JavaScript --
- * which is the one thing this page does not have. It simply arrives.
+ * One keyframe on load, on the hero's contents. The plate itself is not faded
+ * -- it is the page's ground, and fading it in reads as a slow-loading image
+ * rather than as an entrance.
  */
 @keyframes fade {
   from { opacity: 0; }
@@ -350,6 +668,10 @@ a {
 
 .fade {
   animation: fade 1.1s cubic-bezier(0.17, 0.84, 0.44, 1) both;
+}
+
+.fade-2 {
+  animation-delay: 0.18s;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -367,30 +689,63 @@ a {
 <body>
 
 <main class="hero">
-  <picture>
-    <!--
-      [BLOCKED] A portrait crop of the key visual has been requested from the
-      client. Once it lands, add it here as the first source and drop the
-      max-aspect-ratio rule in the stylesheet:
 
-        <source media="(max-aspect-ratio: 1/1)"
-                srcset="images/hero-portrait.avif" type="image/avif">
+  <!--
+    The plate. alt is empty because it is now genuinely decorative: every word
+    that used to be baked into this image is real text below it. That is the
+    accessibility win that comes free with rebuilding the composition -- the
+    old build had to carry the entire title in an alt attribute.
 
-      Until then portrait screens show the whole 16:9 artwork letterboxed on the
-      artwork's blue, rather than cropping its title away. That is the interim
-      state, not a bug.
-    -->
+    The portrait sources are a centred 9:16 slice of the same plate, cut at full
+    resolution. Without them a phone would be scaling the 3:2 landscape file up
+    by about 3x to cover a tall screen, and the marbling would go soft.
+
+    There is deliberately no decoding="async" here. This image is the page's
+    ground, not an illustration in it, and async decoding explicitly permits
+    painting the first frame without it -- which shows the flat fallback blue
+    and then snaps to the artwork. Left at the default, the high fetch priority
+    above gets it decoded with the rest of the first paint.
+  -->
+  <picture class="hero-bg">
     <source
-      srcset="images/hero-1920.avif 1920w, images/hero-1280.avif 1280w, images/hero-768.avif 768w"
-      type="image/avif"
-      sizes="100vw">
+      media="(max-aspect-ratio: 3/4)"
+      srcset="images/hero-por-720.avif 720w, images/hero-por-1080.avif 1080w"
+      sizes="100vw"
+      type="image/avif">
+    <source
+      media="(max-aspect-ratio: 3/4)"
+      srcset="images/hero-por-720.webp"
+      type="image/webp">
+    <source
+      srcset="images/hero-768.avif 768w, images/hero-1280.avif 1280w, images/hero-1920.avif 1920w"
+      sizes="100vw"
+      type="image/avif">
     <img
-      class="hero-img fade"
-      src="images/hero-768.webp"
-      width="2320"
-      height="1305"
-      alt="Bridging Resilience(s): The 10th Sustainable Cities and Landscapes Conference. 21–23 May 2027, Singapore. Presented by APRU and the NUS Department of Architecture, College of Design and Engineering.">
+      class="hero-img"
+      src="images/hero-1280.webp"
+      width="1920"
+      height="1280"
+      alt=""
+      fetchpriority="high">
   </picture>
+
+  <div class="hero-in">
+    <div class="kv fade">
+      <h1 class="kv-title">
+        <span>Bridging Resilience(s):</span>
+        <span>The 10<sup>th</sup> Sustainable Cities and Landscapes Conference</span>
+      </h1>
+      <p class="kv-date">21—23 May 2027, Singapore</p>
+    </div>
+
+    <div class="kv-marks fade fade-2">
+      <img class="mark-apru" src="images/apru.svg" width="330" height="102"
+           alt="APRU — the Association of Pacific Rim Universities">
+      <img class="mark-nus" src="images/nus.svg" width="690" height="93"
+           alt="National University of Singapore — Department of Architecture, College of Design and Engineering">
+    </div>
+  </div>
+
 </main>
 
 <footer class="ftr">
